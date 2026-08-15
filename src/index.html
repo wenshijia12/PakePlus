@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>钓掌柜 · 客户跟进管理系统</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <style>
+        /* ===== 全局重置 ===== */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --primary: #2a7de1;
+            --primary-light: #e8f0fe;
+            --primary-dark: #1a5fb4;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --gray-50: #f8f9fa;
+            --gray-100: #f1f3f5;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+            --radius: 8px;
+            --shadow: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        body {
+            font-family: var(--font);
+            background: var(--gray-50);
+            color: var(--gray-800);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            overflow: hidden;
+        }
+        .app {
+            width: 100%;
+            max-width: 1600px;
+            height: 100%;
+            max-height: 960px;
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        /* ===== 顶栏 ===== */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            background: #fff;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .app-header .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        .app-header .logo span { color: var(--primary); }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .header-actions .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .header-actions .search-box input {
+            padding: 5px 10px 5px 30px;
+            border: 1px solid var(--gray-200);
+            border-radius: 20px;
+            font-size: 13px;
+            width: 160px;
+            background: var(--gray-50);
+            transition: 0.2s;
+            outline: none;
+        }
+        .header-actions .search-box input:focus {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(42,125,225,0.12);
+            width: 200px;
+        }
+        .header-actions .search-box .icon {
+            position: absolute;
+            left: 10px;
+            color: var(--gray-400);
+            font-size: 12px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 14px;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            white-space: nowrap;
+        }
+        .btn:hover { background: var(--gray-200); transform: translateY(-1px); }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); box-shadow: 0 4px 12px rgba(42,125,225,0.3); }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-success:hover { background: #27ae60; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-outline { background: transparent; border: 1px solid var(--gray-300); }
+        .btn-outline:hover { background: var(--gray-50); }
+        .btn-sm { padding: 3px 10px; font-size: 12px; }
+        .btn-xs { padding: 2px 8px; font-size: 11px; }
+        /* ===== 主体 ===== */
+        .app-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        /* ===== 侧边栏 ===== */
+        .sidebar {
+            width: 420px;
+            min-width: 280px;
+            border-right: 1px solid var(--gray-200);
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            flex-shrink: 0;
+        }
+        .sidebar-header {
+            padding: 8px 16px 6px;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            flex-shrink: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .sidebar-header .count { font-weight: 400; color: var(--gray-500); font-size: 13px; }
+        .filter-section {
+            padding: 4px 16px 6px;
+            border-bottom: 1px solid var(--gray-100);
+            flex-shrink: 0;
+        }
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin-top: 3px;
+        }
+        .filter-group .filter-btn {
+            padding: 2px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            background: #fff;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--gray-600);
+        }
+        .filter-group .filter-btn:hover { border-color: var(--gray-400); }
+        .filter-group .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        .filter-label {
+            font-size: 11px;
+            color: var(--gray-500);
+            margin-right: 4px;
+            font-weight: 500;
+        }
+        .client-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px 8px 12px;
+        }
+        .client-list::-webkit-scrollbar { width: 4px; }
+        .client-list::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 10px; }
+        .client-item {
+            padding: 7px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-bottom: 2px;
+            border-left: 3px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+        .client-item:hover { background: var(--gray-50); }
+        .client-item.active { background: var(--primary-light); border-left-color: var(--primary); }
+        .client-item .info { flex: 1; min-width: 0; }
+        .client-item .info .name {
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .client-item .info .name .badge {
+            font-size: 9px;
+            font-weight: 500;
+            padding: 0 6px;
+            border-radius: 10px;
+            background: var(--gray-200);
+            color: var(--gray-600);
+            line-height: 16px;
+        }
+        .badge-stage { background: #dbeafe !important; color: #1a5fb4 !important; }
+        .badge-status-待上线 { background: #fef3c7; color: #d97706; }
+        .badge-status-已上线 { background: #dbeafe; color: #1d4ed8; }
+        .badge-status-正常 { background: #d1fae5; color: #059669; }
+        .badge-status-即将到期 { background: #fed7aa; color: #c2410c; }
+        .badge-status-终止 { background: #fee2e2; color: #dc2626; }
+        .badge-signed-yes { background: #d1fae5; color: #059669; }
+        .badge-signed-no { background: #fee2e2; color: #dc2626; }
+        .client-item .info .sub {
+            font-size: 11px;
+            color: var(--gray-500);
+            margin-top: 1px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .client-item .info .sub span { display: flex; align-items: center; gap: 2px; }
+        .client-item .meta {
+            text-align: right;
+            flex-shrink: 0;
+            font-size: 10px;
+            color: var(--gray-400);
+        }
+        .client-item .meta .unread {
+            background: var(--primary);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 600;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+        .empty-state { text-align: center; padding: 30px 16px; color: var(--gray-400); font-size: 13px; }
+        /* ===== 右侧详情 ===== */
+        .detail-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--gray-50);
+            overflow: hidden;
+        }
+        .detail-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-400);
+        }
+        .detail-empty h4 { color: var(--gray-500); font-weight: 500; font-size: 16px; }
+        .detail-client {
+            background: #fff;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--gray-200);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 45vh;
+            overflow-y: auto;
+        }
+        .detail-client .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .detail-client .top-row .left { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+        .detail-client .top-row .left .name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .detail-client .top-row .left .name-row h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        .detail-client .top-row .left .name-row .status-select {
+            padding: 1px 8px;
+            border-radius: 14px;
+            border: 1px solid var(--gray-300);
+            font-size: 12px;
+            font-weight: 500;
+            background: #fff;
+            cursor: pointer;
+            outline: none;
+        }
+        .detail-client .top-row .left .fields {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 14px;
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+        .detail-client .top-row .left .fields .field {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .detail-client .top-row .left .fields .field .label { color: var(--gray-400); }
+        .detail-client .top-row .right-actions {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        .detail-client .extra-fields {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 16px;
+            font-size: 12px;
+            color: var(--gray-600);
+            background: var(--gray-50);
+            padding: 4px 10px;
+            border-radius: 6px;
+            align-items: center;
+        }
+        .detail-client .extra-fields .item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .detail-client .extra-fields .item .tag { color: var(--gray-400); }
+        .detail-client .extra-fields .item .stage-select {
+            padding: 0 6px;
+            border-radius: 10px;
+            border: 1px solid var(--gray-300);
+            font-size: 12px;
+            background: #fff;
+            cursor: pointer;
+            outline: none;
+        }
+        /* 交付里程碑 */
+        .delivery-milestone {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 2px 4px;
+            padding: 4px 0 2px;
+            font-size: 11px;
+        }
+        .delivery-milestone .step {
+            padding: 1px 8px;
+            border-radius: 12px;
+            background: var(--gray-200);
+            color: var(--gray-500);
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .delivery-milestone .step.active {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 500;
+        }
+        .delivery-milestone .step.done {
+            background: var(--success);
+            color: #fff;
+        }
+        .delivery-milestone .arrow { color: var(--gray-300); font-size: 10px; }
+        /* 阶段历史时间线（可视化） */
+        .history-timeline {
+            margin-top: 6px;
+            border-top: 1px solid var(--gray-100);
+            padding-top: 6px;
+        }
+        .history-timeline .toggle-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .history-timeline .toggle-btn:hover { text-decoration: underline; }
+        .history-timeline .timeline-content {
+            display: none;
+            padding: 8px 0 4px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .history-timeline .timeline-content.open { display: block; }
+        .history-timeline .timeline-item {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            font-size: 12px;
+            padding: 3px 0;
+            border-bottom: 1px dashed var(--gray-100);
+        }
+        .history-timeline .timeline-item .time { color: var(--gray-500); width: 100px; flex-shrink: 0; }
+        .history-timeline .timeline-item .change { font-weight: 500; color: var(--gray-700); }
+        .history-timeline .timeline-item .by { color: var(--gray-400); font-size: 11px; }
+        .history-timeline .empty-msg { color: var(--gray-400); font-size: 12px; padding: 8px 0; }
+        /* ===== 数据看板模态框 ===== */
+        .dashboard-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
+            animation: fadeIn 0.25s;
+        }
+        .dashboard-overlay.hidden { display: none; }
+        .dashboard-box {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+        .dashboard-box .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray-400);
+        }
+        .dashboard-box .close-btn:hover { color: var(--gray-700); }
+        .dashboard-box h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--gray-900);
+        }
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--gray-50);
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: var(--gray-600);
+            margin-top: 4px;
+        }
+        .chart-container {
+            height: 300px;
+            margin-top: 12px;
+        }
+        .funnel-table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 13px;
+        }
+        .funnel-table th, .funnel-table td {
+            border: 1px solid var(--gray-200);
+            padding: 6px 10px;
+            text-align: left;
+        }
+        .funnel-table th { background: var(--gray-100); font-weight: 600; }
+        /* 跟进 */
+        .follow-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 18px 14px;
+            overflow: hidden;
+        }
+        .follow-section .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            flex-shrink: 0;
+        }
+        .follow-section .section-title .count {
+            font-weight: 400;
+            color: var(--gray-400);
+            font-size: 12px;
+        }
+        .follow-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .follow-list::-webkit-scrollbar { width: 4px; }
+        .follow-list::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 10px; }
+        .follow-item {
+            background: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        .follow-item .content { flex: 1; }
+        .follow-item .content .text { font-size: 13px; color: var(--gray-700); }
+        .follow-item .content .meta {
+            font-size: 10px;
+            color: var(--gray-400);
+            margin-top: 2px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .follow-item .content .meta .type {
+            background: var(--gray-100);
+            padding: 0 6px;
+            border-radius: 8px;
+            color: var(--gray-600);
+        }
+        .follow-item .del-btn {
+            background: none;
+            border: none;
+            color: var(--gray-300);
+            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .follow-item .del-btn:hover { color: var(--danger); background: #fee2e2; }
+        .follow-empty { text-align: center; padding: 20px; color: var(--gray-400); font-size: 13px; }
+        .follow-form {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+            flex-shrink: 0;
+            background: #fff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .follow-form input, .follow-form select {
+            padding: 4px 8px;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            background: var(--gray-50);
+            transition: 0.2s;
+            font-family: var(--font);
+        }
+        .follow-form input:focus, .follow-form select:focus {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(42,125,225,0.08);
+        }
+        .follow-form input { flex: 1; min-width: 100px; }
+        .follow-form select { min-width: 70px; }
+        /* ===== 模态框（编辑） ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            animation: fadeIn 0.2s;
+        }
+        .modal-overlay.hidden { display: none; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            max-width: 720px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 14px; color: var(--gray-900); }
+        .modal .form-group { margin-bottom: 10px; }
+        .modal .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 2px;
+        }
+        .modal .form-group input,
+        .modal .form-group select,
+        .modal .form-group textarea {
+            width: 100%;
+            padding: 5px 8px;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            background: #fff;
+            transition: 0.2s;
+            font-family: var(--font);
+        }
+        .modal .form-group input:focus,
+        .modal .form-group select:focus,
+        .modal .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(42,125,225,0.08);
+        }
+        .modal .form-group textarea { resize: vertical; min-height: 36px; }
+        .modal .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .modal .modal-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 14px;
+        }
+        /* ===== 响应式 ===== */
+        @media (max-width: 900px) {
+            .app { max-height: none; border-radius: 0; height: 100vh; }
+            .sidebar { width: 280px; min-width: 200px; }
+            .dashboard-box { padding: 16px; }
+        }
+        @media (max-width: 680px) {
+            body { padding: 0; }
+            .app { border-radius: 0; }
+            .app-body { flex-direction: column; }
+            .sidebar { width: 100%; min-width: 0; max-height: 40vh; border-right: none; border-bottom: 1px solid var(--gray-200); }
+            .detail-panel { flex: 1; min-height: 0; }
+            .modal .form-row { grid-template-columns: 1fr; }
+            .detail-client .extra-fields { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .follow-form { flex-direction: column; align-items: stretch; }
+            .follow-form input { min-width: 0; }
+            .delivery-milestone { font-size: 10px; }
+            .dashboard-stats { grid-template-columns: 1fr 1fr; }
+            .history-timeline .timeline-item { flex-wrap: wrap; gap: 4px; }
+            .history-timeline .timeline-item .time { width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app" id="app">
+    <!-- 顶栏 -->
+    <header class="app-header">
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                <rect x="2" y="2" width="24" height="24" rx="6" fill="#2a7de1" />
+                <path d="M8 14L12 18L20 10" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            钓掌柜 · <span>客户跟进</span>
+        </div>
+        <div class="header-actions">
+            <div class="search-box">
+                <span class="icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="搜索钓场/联系人..." />
+            </div>
+            <button class="btn btn-primary" id="addClientBtn">+ 添加钓场</button>
+            <button class="btn btn-success" id="exportBtn">📊 导出报表</button>
+            <button class="btn btn-outline" id="dashboardBtn">📈 数据看板</button>
+        </div>
+    </header>
+
+    <!-- 主体 -->
+    <div class="app-body">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span>钓场列表 <span class="count" id="clientCount">0</span></span>
+            </div>
+            <div class="filter-section" id="filterContainer">
+                <div class="filter-group">
+                    <span class="filter-label">状态：</span>
+                    <button class="filter-btn active" data-filter="all">全部</button>
+                    <button class="filter-btn" data-filter="待上线">待上线</button>
+                    <button class="filter-btn" data-filter="已上线">已上线</button>
+                    <button class="filter-btn" data-filter="正常">正常</button>
+                    <button class="filter-btn" data-filter="即将到期">即将到期</button>
+                    <button class="filter-btn" data-filter="终止">终止</button>
+                </div>
+                <div class="filter-group" style="margin-top:4px;">
+                    <span class="filter-label">阶段：</span>
+                    <button class="filter-btn active" data-stage="all">全部</button>
+                    <button class="filter-btn" data-stage="初步接触">初步接触</button>
+                    <button class="filter-btn" data-stage="需求确认">需求确认</button>
+                    <button class="filter-btn" data-stage="方案报价">方案报价</button>
+                    <button class="filter-btn" data-stage="谈判">谈判</button>
+                    <button class="filter-btn" data-stage="签约">签约</button>
+                    <button class="filter-btn" data-stage="服务中">服务中</button>
+                    <button class="filter-btn" data-stage="续约">续约</button>
+                    <button class="filter-btn" data-stage="流失">流失</button>
+                </div>
+            </div>
+            <div class="client-list" id="clientList"></div>
+        </aside>
+
+        <!-- 详情 -->
+        <main class="detail-panel" id="detailPanel">
+            <div class="detail-empty" id="emptyDetail">
+                <svg width="48" height="48" viewBox="0 0 64 64" fill="none">
+                    <circle cx="32" cy="32" r="28" stroke="#d1d5db" stroke-width="2" />
+                    <path d="M24 28h16M24 36h10" stroke="#d1d5db" stroke-width="2" stroke-linecap="round" />
+                    <circle cx="32" cy="32" r="4" fill="#d1d5db" />
+                </svg>
+                <h4>选择一个钓场</h4>
+                <p style="font-size:13px;">点击左侧列表查看详情与跟进</p>
+            </div>
+
+            <div id="detailContent" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+                <!-- 客户信息 -->
+                <div class="detail-client" id="detailClient">
+                    <div class="top-row">
+                        <div class="left">
+                            <div class="name-row">
+                                <h2 id="detailName">——</h2>
+                                <select class="status-select" id="detailStatus">
+                                    <option value="待上线">待上线</option>
+                                    <option value="已上线">已上线</option>
+                                    <option value="正常">正常</option>
+                                    <option value="即将到期">即将到期</option>
+                                    <option value="终止">终止</option>
+                                </select>
+                            </div>
+                            <div class="fields">
+                                <span class="field"><span class="label">联系人</span> <span id="detailContact">——</span></span>
+                                <span class="field"><span class="label">电话</span> <span id="detailPhone">——</span></span>
+                                <span class="field"><span class="label">负责人</span> <span id="detailPerson">——</span></span>
+                                <span class="field"><span class="label">签约</span> <span id="detailSigned">——</span></span>
+                            </div>
+                        </div>
+                        <div class="right-actions">
+                            <button class="btn btn-outline btn-sm" id="editClientBtn">✎ 编辑</button>
+                            <button class="btn btn-danger btn-sm" id="deleteClientBtn">🗑 删除</button>
+                        </div>
+                    </div>
+                    <div class="extra-fields">
+                        <span class="item"><span class="tag">阶段</span>
+                            <select class="stage-select" id="detailStage">
+                                <option value="初步接触">初步接触</option>
+                                <option value="需求确认">需求确认</option>
+                                <option value="方案报价">方案报价</option>
+                                <option value="谈判">谈判</option>
+                                <option value="签约">签约</option>
+                                <option value="服务中">服务中</option>
+                                <option value="续约">续约</option>
+                                <option value="流失">流失</option>
+                            </select>
+                        </span>
+                        <span class="item"><span class="tag">预测流水</span> <span id="detailRevenue">——</span> W</span>
+                        <span class="item"><span class="tag">交易费率</span> <span id="detailTransRate">——</span></span>
+                        <span class="item"><span class="tag">提现费率</span> <span id="detailWithdrawRate">——</span></span>
+                        <span class="item"><span class="tag">已付</span> <span id="detailPaid">——</span></span>
+                        <span class="item"><span class="tag">未结</span> <span id="detailUnpaid">——</span></span>
+                        <span class="item"><span class="tag">合同编号</span> <span id="detailContract">——</span></span>
+                        <span class="item" style="flex:1;"><span class="tag">赠送内容</span> <span id="detailGift">——</span></span>
+                        <span class="item" style="flex:1;"><span class="tag">签约赠送项</span> <span id="detailSigningGift">——</span></span>
+                        <span class="item" style="flex:1;"><span class="tag">地址</span> <span id="detailAddress">——</span></span>
+                        <span class="item" style="flex:1;"><span class="tag">备注</span> <span id="detailNote">——</span></span>
+                    </div>
+                    <!-- 交付里程碑 -->
+                    <div class="delivery-milestone" id="milestoneContainer">
+                        <span class="step" data-step="初步接触">初步接触</span>
+                        <span class="arrow">→</span>
+                        <span class="step" data-step="需求确认">需求确认</span>
+                        <span class="arrow">→</span>
+                        <span class="step" data-step="方案报价">方案报价</span>
+                        <span class="arrow">→</span>
+                        <span class="step" data-step="谈判">谈判</span>
+                        <span class="arrow">→</span>
+                        <span class="step" data-step="签约">签约</span>
+                        <span class="arrow">→</span>
+                        <span class="step" data-step="服务中">服务中</span>
+                    </div>
+                    <!-- 阶段历史时间线（可视化） -->
+                    <div class="history-timeline">
+                        <button class="toggle-btn" id="historyToggleBtn">📜 阶段历史时间线 ▾</button>
+                        <div class="timeline-content" id="timelineContent">
+                            <!-- 动态渲染 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 跟进 -->
+                <div class="follow-section">
+                    <div class="section-title">
+                        📋 跟进记录
+                        <span class="count" id="followCount">0</span>
+                    </div>
+                    <div class="follow-list" id="followList"></div>
+                    <div class="follow-form">
+                        <input type="text" id="followInput" placeholder="输入跟进内容..." />
+                        <select id="followType">
+                            <option value="电话">📞 电话</option>
+                            <option value="微信">💬 微信</option>
+                            <option value="邮件">✉️ 邮件</option>
+                            <option value="面谈">🤝 面谈</option>
+                            <option value="系统">⚙️ 系统</option>
+                            <option value="其他">📌 其他</option>
+                        </select>
+                        <button class="btn btn-primary btn-sm" id="addFollowBtn">添加</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- ===== 数据看板模态框 ===== -->
+<div class="dashboard-overlay hidden" id="dashboardOverlay">
+    <div class="dashboard-box">
+        <button class="close-btn" id="dashboardCloseBtn">&times;</button>
+        <h2>📈 数据看板</h2>
+        <div class="dashboard-stats" id="statsContainer">
+            <!-- 动态生成 -->
+        </div>
+        <div style="margin-top: 16px;">
+            <h3 style="font-size:16px; font-weight:600; margin-bottom:8px;">销售漏斗（各阶段客户数）</h3>
+            <div class="chart-container">
+                <canvas id="funnelChart"></canvas>
+            </div>
+        </div>
+        <div style="margin-top: 20px;">
+            <h3 style="font-size:16px; font-weight:600; margin-bottom:8px;">阶段分布明细</h3>
+            <table class="funnel-table" id="funnelTable">
+                <thead><tr><th>阶段</th><th>客户数</th><th>占比</th></tr></thead>
+                <tbody id="funnelTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 添加/编辑模态框 ===== -->
+<div class="modal-overlay hidden" id="clientModal">
+    <div class="modal">
+        <h3 id="modalTitle">添加钓场</h3>
+        <form id="clientForm" autocomplete="off">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>钓场名称 *</label>
+                    <input type="text" id="formName" placeholder="请输入钓场名称" required />
+                </div>
+                <div class="form-group">
+                    <label>联系人</label>
+                    <input type="text" id="formContact" placeholder="请输入联系人" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>联系电话</label>
+                    <input type="text" id="formPhone" placeholder="请输入电话" />
+                </div>
+                <div class="form-group">
+                    <label>负责人</label>
+                    <input type="text" id="formPerson" placeholder="请输入负责人" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>是否签约</label>
+                    <select id="formSigned">
+                        <option value="是">是</option>
+                        <option value="否">否</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>当前状态</label>
+                    <select id="formStatus">
+                        <option value="待上线">待上线</option>
+                        <option value="已上线">已上线</option>
+                        <option value="正常">正常</option>
+                        <option value="即将到期">即将到期</option>
+                        <option value="终止">终止</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>销售阶段</label>
+                    <select id="formStage">
+                        <option value="初步接触">初步接触</option>
+                        <option value="需求确认">需求确认</option>
+                        <option value="方案报价">方案报价</option>
+                        <option value="谈判">谈判</option>
+                        <option value="签约">签约</option>
+                        <option value="服务中">服务中</option>
+                        <option value="续约">续约</option>
+                        <option value="流失">流失</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>预测流水 (W)</label>
+                    <input type="number" id="formRevenue" placeholder="如 500" step="any" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>交易费率</label>
+                    <input type="text" id="formTransRate" placeholder="如 0.35%" />
+                </div>
+                <div class="form-group">
+                    <label>提现费率</label>
+                    <input type="text" id="formWithdrawRate" placeholder="如 0.30%" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>已付金额</label>
+                    <input type="number" id="formPaid" placeholder="0" step="any" />
+                </div>
+                <div class="form-group">
+                    <label>未结金额</label>
+                    <input type="number" id="formUnpaid" placeholder="0" step="any" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>合同编号</label>
+                    <input type="text" id="formContract" placeholder="请输入合同编号" />
+                </div>
+                <div class="form-group">
+                    <label>签约赠送项</label>
+                    <input type="text" id="formSigningGift" placeholder="签约时赠送的权益/物品" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>赠送内容（其他）</label>
+                <textarea id="formGift" placeholder="其他赠送功能/时长/服务/物料等"></textarea>
+            </div>
+            <div class="form-group">
+                <label>钓场地址 / 区域</label>
+                <input type="text" id="formAddress" placeholder="请输入地址" />
+            </div>
+            <div class="form-group">
+                <label>备注</label>
+                <textarea id="formNote" placeholder="特殊需求、续约意向、投诉问题等"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" id="modalCancelBtn">取消</button>
+                <button type="submit" class="btn btn-primary" id="modalSubmitBtn">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  数据层（含阶段历史）
+    // ============================================================
+    const STORAGE_KEY = 'fishery_crm_data_v5';
+
+    function getDefaultData() {
+        return {
+            clients: [
+                // 前20条略，实际会补全；这里只展示一条样例，实际代码中会包含完整数据
+                // 但为了保持代码完整性，我们稍后会在init中补全所有数据
+            ],
+            follows: {}
+        };
+    }
+
+    let data = loadData();
+
+    function loadData() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (!parsed.follows) parsed.follows = {};
+                parsed.clients.forEach(c => {
+                    if (!c.stage) c.stage = '初步接触';
+                    if (!c.signingGift) c.signingGift = '';
+                    if (!c.stageHistory || !Array.isArray(c.stageHistory)) c.stageHistory = [];
+                });
+                return parsed;
+            }
+        } catch (_) {}
+        // 若没有数据，初始化完整数据集（包含1~47）
+        return initFullData();
+    }
+
+    function initFullData() {
+        // 此处完整复制之前的所有数据（1~47），为了节省篇幅，我们直接调用预置函数
+        // 实际代码中我们会完整嵌入，这里使用一个生成器
+        const raw = getDefaultData();
+        // 填充1~47（代码中会完整包含，此处仅示意）
+        // 由于代码长度限制，我们将在实际输出中提供完整数据
+        // 这里先返回一个空数据，然后由下方的init函数补全
+        return raw;
+    }
+
+    // 为了真正包含所有数据，我们在初始化时直接构建完整列表
+    // 在下面的init函数中，我们会用完整数据填充
+
+    function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function genId() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    }
+
+    function formatTime(ts) {
+        const d = new Date(ts);
+        const now = Date.now();
+        const diff = (now - d) / 1000;
+        if (diff < 60) return '刚刚';
+        if (diff < 3600) return Math.floor(diff/60) + '分钟前';
+        if (diff < 86400) return Math.floor(diff/3600) + '小时前';
+        if (diff < 604800) return Math.floor(diff/86400) + '天前';
+        return d.toLocaleDateString('zh-CN', { month:'short', day:'numeric' });
+    }
+    function formatTimeFull(ts) {
+        return new Date(ts).toLocaleString('zh-CN', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    }
+
+    // ============================================================
+    //  状态与 DOM
+    // ============================================================
+    let currentClientId = null;
+    let currentFilter = 'all';
+    let currentStageFilter = 'all';
+    let searchKeyword = '';
+
+    const $ = s => document.querySelector(s);
+    const clientListEl = $('#clientList');
+    const clientCountEl = $('#clientCount');
+    const searchInput = $('#searchInput');
+    const filterContainer = $('#filterContainer');
+    const emptyDetail = $('#emptyDetail');
+    const detailContent = $('#detailContent');
+    const detailName = $('#detailName');
+    const detailContact = $('#detailContact');
+    const detailPhone = $('#detailPhone');
+    const detailPerson = $('#detailPerson');
+    const detailSigned = $('#detailSigned');
+    const detailStatus = $('#detailStatus');
+    const detailStage = $('#detailStage');
+    const detailRevenue = $('#detailRevenue');
+    const detailTransRate = $('#detailTransRate');
+    const detailWithdrawRate = $('#detailWithdrawRate');
+    const detailPaid = $('#detailPaid');
+    const detailUnpaid = $('#detailUnpaid');
+    const detailContract = $('#detailContract');
+    const detailGift = $('#detailGift');
+    const detailSigningGift = $('#detailSigningGift');
+    const detailAddress = $('#detailAddress');
+    const detailNote = $('#detailNote');
+    const milestoneContainer = $('#milestoneContainer');
+    const historyToggleBtn = $('#historyToggleBtn');
+    const timelineContent = $('#timelineContent');
+    const followList = $('#followList');
+    const followCount = $('#followCount');
+    const followInput = $('#followInput');
+    const followType = $('#followType');
+    const addFollowBtn = $('#addFollowBtn');
+    const addClientBtn = $('#addClientBtn');
+    const editClientBtn = $('#editClientBtn');
+    const deleteClientBtn = $('#deleteClientBtn');
+    const exportBtn = $('#exportBtn');
+    const dashboardBtn = $('#dashboardBtn');
+    const dashboardOverlay = $('#dashboardOverlay');
+    const dashboardCloseBtn = $('#dashboardCloseBtn');
+    const statsContainer = $('#statsContainer');
+    const funnelTableBody = $('#funnelTableBody');
+    const modal = $('#clientModal');
+    const modalTitle = $('#modalTitle');
+    const clientForm = $('#clientForm');
+    const formName = $('#formName');
+    const formContact = $('#formContact');
+    const formPhone = $('#formPhone');
+    const formPerson = $('#formPerson');
+    const formSigned = $('#formSigned');
+    const formStatus = $('#formStatus');
+    const formStage = $('#formStage');
+    const formRevenue = $('#formRevenue');
+    const formTransRate = $('#formTransRate');
+    const formWithdrawRate = $('#formWithdrawRate');
+    const formPaid = $('#formPaid');
+    const formUnpaid = $('#formUnpaid');
+    const formContract = $('#formContract');
+    const formSigningGift = $('#formSigningGift');
+    const formGift = $('#formGift');
+    const formAddress = $('#formAddress');
+    const formNote = $('#formNote');
+    const modalSubmitBtn = $('#modalSubmitBtn');
+    const modalCancelBtn = $('#modalCancelBtn');
+    let editingClientId = null;
+
+    // Chart.js 实例
+    let funnelChartInstance = null;
+
+    // ============================================================
+    //  渲染函数
+    // ============================================================
+    function getFilteredClients() {
+        let list = data.clients;
+        if (currentFilter !== 'all') {
+            list = list.filter(c => c.status === currentFilter);
+        }
+        if (currentStageFilter !== 'all') {
+            list = list.filter(c => c.stage === currentStageFilter);
+        }
+        if (searchKeyword.trim()) {
+            const kw = searchKeyword.trim().toLowerCase();
+            list = list.filter(c =>
+                c.name.toLowerCase().includes(kw) ||
+                (c.contact && c.contact.toLowerCase().includes(kw)) ||
+                (c.phone && c.phone.includes(kw))
+            );
+        }
+        return list.sort((a, b) => b.id - a.id);
+    }
+
+    function renderClientList() {
+        const list = getFilteredClients();
+        clientCountEl.textContent = list.length;
+        if (list.length === 0) {
+            clientListEl.innerHTML = `<div class="empty-state"><p>暂无匹配钓场</p></div>`;
+            return;
+        }
+        let html = '';
+        list.forEach(c => {
+            const follows = data.follows[c.id] || [];
+            const last = follows.length ? follows[follows.length-1] : null;
+            const statusCls = 'status-' + c.status;
+            const signedCls = c.signed === '是' ? 'signed-yes' : 'signed-no';
+            const active = c.id === currentClientId ? 'active' : '';
+            html += `
+                <div class="client-item ${active}" data-id="${c.id}">
+                    <div class="info">
+                        <div class="name">
+                            ${c.name}
+                            <span class="badge ${statusCls}">${c.status || '未设'}</span>
+                            <span class="badge ${signedCls}">${c.signed === '是' ? '✓签约' : '✗未签'}</span>
+                            <span class="badge badge-stage">${c.stage || '未设'}</span>
+                        </div>
+                        <div class="sub">
+                            <span>👤 ${c.contact || '未填'}</span>
+                            ${c.phone ? `<span>📞 ${c.phone}</span>` : ''}
+                            ${last ? `<span>📌 ${last.content.slice(0, 10)}${last.content.length>10?'…':''}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="meta">
+                        <div>${formatTime(c.id * 1000)}</div>
+                        ${follows.length > 0 ? `<div class="unread">${follows.length}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        clientListEl.innerHTML = html;
+        clientListEl.querySelectorAll('.client-item').forEach(el => {
+            el.addEventListener('click', () => selectClient(el.dataset.id));
+        });
+    }
+
+    function selectClient(id) {
+        const client = data.clients.find(c => c.id === id);
+        if (!client) return;
+        currentClientId = id;
+        renderClientList();
+        renderDetail(client);
+    }
+
+    function updateMilestone(stage) {
+        const steps = ['初步接触', '需求确认', '方案报价', '谈判', '签约', '服务中'];
+        const idx = steps.indexOf(stage);
+        milestoneContainer.querySelectorAll('.step').forEach(el => {
+            const s = el.dataset.step;
+            const pos = steps.indexOf(s);
+            el.classList.remove('active', 'done');
+            if (pos <= idx && idx !== -1) {
+                el.classList.add('done');
+            }
+            if (s === stage) {
+                el.classList.remove('done');
+                el.classList.add('active');
+            }
+        });
+    }
+
+    function renderHistoryTimeline(client) {
+        const history = client.stageHistory || [];
+        const container = timelineContent;
+        if (history.length === 0) {
+            container.innerHTML = `<div class="empty-msg">暂无阶段变更记录</div>`;
+            return;
+        }
+        const sorted = [...history].sort((a,b) => b.time - a.time);
+        let html = '';
+        sorted.forEach(h => {
+            html += `
+                <div class="timeline-item">
+                    <span class="time">${formatTimeFull(h.time)}</span>
+                    <span class="change">${h.from || '未知'} → ${h.to}</span>
+                    <span class="by">${h.by || '系统'}</span>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function renderDetail(client) {
+        if (!client) {
+            emptyDetail.style.display = 'flex';
+            detailContent.style.display = 'none';
+            return;
+        }
+        emptyDetail.style.display = 'none';
+        detailContent.style.display = 'flex';
+
+        detailName.textContent = client.name;
+        detailContact.textContent = client.contact || '未填';
+        detailPhone.textContent = client.phone || '未填';
+        detailPerson.textContent = client.person || '未填';
+        detailSigned.textContent = client.signed || '否';
+        detailStatus.value = client.status;
+        detailStage.value = client.stage || '初步接触';
+
+        detailRevenue.textContent = client.revenue ?? '—';
+        detailTransRate.textContent = client.transRate || '—';
+        detailWithdrawRate.textContent = client.withdrawRate || '—';
+        detailPaid.textContent = client.paid ?? '—';
+        detailUnpaid.textContent = client.unpaid ?? '—';
+        detailContract.textContent = client.contract || '—';
+        detailGift.textContent = client.gift || '—';
+        detailSigningGift.textContent = client.signingGift || '—';
+        detailAddress.textContent = client.address || '—';
+        detailNote.textContent = client.note || '—';
+
+        updateMilestone(client.stage || '初步接触');
+        renderHistoryTimeline(client);
+
+        const follows = data.follows[client.id] || [];
+        followCount.textContent = follows.length;
+        if (follows.length === 0) {
+            followList.innerHTML = `<div class="follow-empty">暂无跟进记录</div>`;
+        } else {
+            const sorted = [...follows].sort((a,b) => b.time - a.time);
+            let html = '';
+            sorted.forEach(f => {
+                const isSystem = f.type === '系统';
+                html += `
+                    <div class="follow-item" style="${isSystem ? 'background:#f0f7ff;' : ''}">
+                        <div class="content">
+                            <div class="text">${f.content}</div>
+                            <div class="meta">
+                                <span class="type">${f.type}</span>
+                                <span>${formatTimeFull(f.time)}</span>
+                            </div>
+                        </div>
+                        <button class="del-btn" data-follow-id="${f.id}">✕</button>
+                    </div>
+                `;
+            });
+            followList.innerHTML = html;
+            followList.querySelectorAll('.del-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const fid = btn.dataset.followId;
+                    if (confirm('确定删除此跟进记录？')) deleteFollow(client.id, fid);
+                });
+            });
+        }
+    }
+
+    function deleteFollow(clientId, followId) {
+        if (!data.follows[clientId]) return;
+        data.follows[clientId] = data.follows[clientId].filter(f => f.id !== followId);
+        if (data.follows[clientId].length === 0) delete data.follows[clientId];
+        saveData();
+        const client = data.clients.find(c => c.id === clientId);
+        if (client) renderDetail(client);
+        renderClientList();
+    }
+
+    function addFollow(clientId, content, type) {
+        if (!content || !content.trim()) return;
+        if (!data.follows[clientId]) data.follows[clientId] = [];
+        data.follows[clientId].push({ id: genId(), content: content.trim(), type: type || '其他', time: Date.now() });
+        saveData();
+        const client = data.clients.find(c => c.id === clientId);
+        if (client) renderDetail(client);
+        renderClientList();
+    }
+
+    // ============================================================
+    //  阶段历史记录
+    // ============================================================
+    function recordStageHistory(clientId, fromStage, toStage, by = '手动') {
+        const client = data.clients.find(c => c.id === clientId);
+        if (!client) return;
+        if (!client.stageHistory) client.stageHistory = [];
+        client.stageHistory.push({
+            time: Date.now(),
+            from: fromStage || '未知',
+            to: toStage,
+            by: by
+        });
+        saveData();
+    }
+
+    // ============================================================
+    //  智能交付逻辑（带历史）
+    // ============================================================
+    function handleStatusChange(clientId, newStatus, oldStatus) {
+        const client = data.clients.find(c => c.id === clientId);
+        if (!client) return;
+
+        let stageChanged = false;
+        let systemMsg = '';
+        let fromStage = client.stage;
+        let toStage = client.stage;
+
+        if ((newStatus === '已上线' || newStatus === '正常') &&
+            ['初步接触', '需求确认', '方案报价', '谈判', '签约'].includes(client.stage)) {
+            if (confirm(`当前状态已变更为“${newStatus}”，是否将阶段自动推进到“服务中”？\n（系统将自动记录一条跟进）`)) {
+                toStage = '服务中';
+                stageChanged = true;
+                systemMsg = `系统自动记录：状态变更为“${newStatus}”，阶段推进至“服务中”。`;
+            }
+        }
+        if (newStatus === '终止' &&
+            ['初步接触', '需求确认', '方案报价', '谈判', '签约', '服务中'].includes(client.stage)) {
+            if (confirm(`状态变更为“终止”，是否将阶段设置为“流失”？`)) {
+                toStage = '流失';
+                stageChanged = true;
+                systemMsg = `系统自动记录：状态变更为“终止”，阶段设置为“流失”。`;
+            }
+        }
+
+        if (stageChanged) {
+            recordStageHistory(client.id, fromStage, toStage, '系统自动');
+            client.stage = toStage;
+            detailStage.value = toStage;
+            if (systemMsg) {
+                if (!data.follows[client.id]) data.follows[client.id] = [];
+                data.follows[client.id].push({
+                    id: genId(),
+                    content: systemMsg,
+                    type: '系统',
+                    time: Date.now()
+                });
+            }
+        }
+
+        client.status = newStatus;
+        saveData();
+        renderClientList();
+        renderDetail(client);
+    }
+
+    // ============================================================
+    //  导出报表（CSV）
+    // ============================================================
+    function exportReport() {
+        const list = getFilteredClients();
+        if (list.length === 0) {
+            alert('当前筛选结果为空，无法导出');
+            return;
+        }
+
+        const headers = [
+            '钓场名称', '联系人', '联系电话', '负责人', '是否签约', '当前状态', '销售阶段',
+            '预测流水(W)', '交易费率', '提现费率', '已付金额', '未结金额', '合同编号',
+            '赠送内容', '签约赠送项', '地址', '备注', '跟进记录'
+        ];
+
+        let rows = [];
+        list.forEach(c => {
+            const follows = data.follows[c.id] || [];
+            const followText = follows
+                .sort((a,b) => b.time - a.time)
+                .map(f => `[${f.type}] ${f.content} (${formatTimeFull(f.time)})`)
+                .join('; ');
+            rows.push([
+                c.name,
+                c.contact || '',
+                c.phone || '',
+                c.person || '',
+                c.signed || '否',
+                c.status || '',
+                c.stage || '',
+                c.revenue ?? '',
+                c.transRate || '',
+                c.withdrawRate || '',
+                c.paid ?? '',
+                c.unpaid ?? '',
+                c.contract || '',
+                c.gift || '',
+                c.signingGift || '',
+                c.address || '',
+                c.note || '',
+                followText
+            ]);
+        });
+
+        let csvContent = '\uFEFF' + headers.join(',') + '\n';
+        rows.forEach(row => {
+            const escaped = row.map(cell => {
+                if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"') || cell.includes('\n'))) {
+                    return `"${cell.replace(/"/g, '""')}"`;
+                }
+                return cell;
+            });
+            csvContent += escaped.join(',') + '\n';
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `钓场客户报表_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    // ============================================================
+    //  数据看板
+    // ============================================================
+    function openDashboard() {
+        // 统计数据
+        const allClients = data.clients;
+        const total = allClients.length;
+        const signed = allClients.filter(c => c.signed === '是').length;
+        const signedRate = total ? (signed / total * 100).toFixed(1) + '%' : '0%';
+        const totalRevenue = allClients.reduce((sum, c) => sum + (c.revenue || 0), 0);
+        const avgRevenue = total ? (totalRevenue / total).toFixed(0) : '0';
+        let totalFollows = 0;
+        for (let id in data.follows) {
+            totalFollows += data.follows[id].length;
+        }
+
+        // 阶段分布
+        const stages = ['初步接触', '需求确认', '方案报价', '谈判', '签约', '服务中', '续约', '流失'];
+        const stageCounts = stages.map(s => allClients.filter(c => c.stage === s).length);
+        const totalStage = stageCounts.reduce((a,b) => a+b, 0);
+
+        // 渲染统计卡片
+        statsContainer.innerHTML = `
+            <div class="stat-card"><div class="number">${total}</div><div class="label">总客户数</div></div>
+            <div class="stat-card"><div class="number">${signed}</div><div class="label">签约客户</div></div>
+            <div class="stat-card"><div class="number">${signedRate}</div><div class="label">签约率</div></div>
+            <div class="stat-card"><div class="number">${avgRevenue}</div><div class="label">平均流水 (W)</div></div>
+            <div class="stat-card"><div class="number">${totalFollows}</div><div class="label">总跟进记录</div></div>
+        `;
+
+        // 渲染表格
+        let tableHtml = '';
+        stages.forEach((s, i) => {
+            const count = stageCounts[i];
+            const pct = totalStage ? (count / totalStage * 100).toFixed(1) + '%' : '0%';
+            tableHtml += `<tr><td>${s}</td><td>${count}</td><td>${pct}</td></tr>`;
+        });
+        funnelTableBody.innerHTML = tableHtml;
+
+        // 渲染漏斗图（水平条形图）
+        const ctx = document.getElementById('funnelChart').getContext('2d');
+        if (funnelChartInstance) {
+            funnelChartInstance.destroy();
+        }
+        const colors = ['#dbeafe', '#bfdbfe', '#93c5fd', '#60a5fa', '#3b82f6', '#2563eb', '#1d4ed8', '#1e40af'];
+        funnelChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: stages,
+                datasets: [{
+                    label: '客户数',
+                    data: stageCounts,
+                    backgroundColor: colors.slice(0, stages.length),
+                    borderColor: '#2a7de1',
+                    borderWidth: 0,
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.x + ' 个客户';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        title: { display: true, text: '客户数量' }
+                    },
+                    y: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        dashboardOverlay.classList.remove('hidden');
+    }
+
+    function closeDashboard() {
+        dashboardOverlay.classList.add('hidden');
+        if (funnelChartInstance) {
+            funnelChartInstance.destroy();
+            funnelChartInstance = null;
+        }
+    }
+
+    // ============================================================
+    //  CRUD
+    // ============================================================
+    function openModal(client = null) {
+        if (client) {
+            modalTitle.textContent = '编辑钓场';
+            formName.value = client.name;
+            formContact.value = client.contact || '';
+            formPhone.value = client.phone || '';
+            formPerson.value = client.person || '';
+            formSigned.value = client.signed || '是';
+            formStatus.value = client.status;
+            formStage.value = client.stage || '初步接触';
+            formRevenue.value = client.revenue ?? '';
+            formTransRate.value = client.transRate || '';
+            formWithdrawRate.value = client.withdrawRate || '';
+            formPaid.value = client.paid ?? '';
+            formUnpaid.value = client.unpaid ?? '';
+            formContract.value = client.contract || '';
+            formSigningGift.value = client.signingGift || '';
+            formGift.value = client.gift || '';
+            formAddress.value = client.address || '';
+            formNote.value = client.note || '';
+            editingClientId = client.id;
+            modalSubmitBtn.textContent = '更新';
+        } else {
+            modalTitle.textContent = '添加钓场';
+            clientForm.reset();
+            formSigned.value = '是';
+            formStatus.value = '待上线';
+            formStage.value = '初步接触';
+            editingClientId = null;
+            modalSubmitBtn.textContent = '保存';
+        }
+        modal.classList.remove('hidden');
+        formName.focus();
+    }
+
+    function closeModal() { modal.classList.add('hidden'); }
+
+    function saveClient(e) {
+        e.preventDefault();
+        const name = formName.value.trim();
+        if (!name) { alert('请输入钓场名称'); return; }
+        const client = {
+            name,
+            contact: formContact.value.trim(),
+            phone: formPhone.value.trim(),
+            person: formPerson.value.trim(),
+            signed: formSigned.value,
+            status: formStatus.value,
+            stage: formStage.value,
+            revenue: formRevenue.value ? parseFloat(formRevenue.value) : null,
+            transRate: formTransRate.value.trim() || null,
+            withdrawRate: formWithdrawRate.value.trim() || null,
+            paid: formPaid.value ? parseFloat(formPaid.value) : null,
+            unpaid: formUnpaid.value ? parseFloat(formUnpaid.value) : null,
+            contract: formContract.value.trim() || null,
+            signingGift: formSigningGift.value.trim() || null,
+            gift: formGift.value.trim() || null,
+            address: formAddress.value.trim() || null,
+            note: formNote.value.trim() || null,
+        };
+        if (editingClientId) {
+            const target = data.clients.find(c => c.id === editingClientId);
+            if (target) {
+                const oldStatus = target.status;
+                const oldStage = target.stage;
+                Object.assign(target, client);
+                if (oldStage !== client.stage) {
+                    recordStageHistory(target.id, oldStage, client.stage, '手动');
+                }
+                saveData();
+                if (currentClientId === editingClientId) {
+                    if (oldStatus !== target.status) {
+                        handleStatusChange(target.id, target.status, oldStatus);
+                    } else {
+                        renderDetail(target);
+                        renderClientList();
+                    }
+                } else {
+                    renderClientList();
+                }
+            }
+        } else {
+            const newId = genId();
+            const newClient = { id: newId, ...client, stageHistory: [{ time: Date.now(), from: '未知', to: client.stage, by: '系统' }] };
+            data.clients.push(newClient);
+            saveData();
+            selectClient(newId);
+        }
+        closeModal();
+    }
+
+    function deleteClient(id) {
+        if (!confirm('确定删除该钓场及其所有跟进记录？')) return;
+        data.clients = data.clients.filter(c => c.id !== id);
+        delete data.follows[id];
+        saveData();
+        if (currentClientId === id) {
+            currentClientId = null;
+            emptyDetail.style.display = 'flex';
+            detailContent.style.display = 'none';
+        }
+        renderClientList();
+    }
+
+    // ============================================================
+    //  事件绑定
+    // ============================================================
+    // 搜索
+    searchInput.addEventListener('input', () => {
+        searchKeyword = searchInput.value;
+        renderClientList();
+        if (currentClientId) {
+            const filtered = getFilteredClients();
+            if (!filtered.some(c => c.id === currentClientId)) {
+                currentClientId = null;
+                emptyDetail.style.display = 'flex';
+                detailContent.style.display = 'none';
+            }
+        }
+    });
+
+    // 筛选（状态 + 阶段）
+    filterContainer.querySelectorAll('[data-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const group = btn.closest('.filter-group');
+            group.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (btn.dataset.filter !== undefined) {
+                currentFilter = btn.dataset.filter;
+                renderClientList();
+                clearDetailIfNeeded();
+            }
+        });
+    });
+    filterContainer.querySelectorAll('[data-stage]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const group = btn.closest('.filter-group');
+            group.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (btn.dataset.stage !== undefined) {
+                currentStageFilter = btn.dataset.stage;
+                renderClientList();
+                clearDetailIfNeeded();
+            }
+        });
+    });
+
+    function clearDetailIfNeeded() {
+        if (currentClientId) {
+            const filtered = getFilteredClients();
+            if (!filtered.some(c => c.id === currentClientId)) {
+                currentClientId = null;
+                emptyDetail.style.display = 'flex';
+                detailContent.style.display = 'none';
+            }
+        }
+    }
+
+    // 按钮事件
+    addClientBtn.addEventListener('click', () => openModal(null));
+    editClientBtn.addEventListener('click', () => {
+        if (!currentClientId) return;
+        const client = data.clients.find(c => c.id === currentClientId);
+        if (client) openModal(client);
+    });
+    deleteClientBtn.addEventListener('click', () => {
+        if (!currentClientId) return;
+        deleteClient(currentClientId);
+    });
+
+    // 历史时间线折叠
+    historyToggleBtn.addEventListener('click', () => {
+        const content = timelineContent;
+        const isOpen = content.classList.toggle('open');
+        historyToggleBtn.textContent = isOpen ? '📜 阶段历史时间线 ▴' : '📜 阶段历史时间线 ▾';
+    });
+
+    // 状态变更
+    detailStatus.addEventListener('change', () => {
+        if (!currentClientId) return;
+        const client = data.clients.find(c => c.id === currentClientId);
+        if (client) {
+            const oldStatus = client.status;
+            const newStatus = detailStatus.value;
+            if (oldStatus !== newStatus) {
+                handleStatusChange(client.id, newStatus, oldStatus);
+            }
+        }
+    });
+
+    // 阶段手动变更
+    detailStage.addEventListener('change', () => {
+        if (!currentClientId) return;
+        const client = data.clients.find(c => c.id === currentClientId);
+        if (client) {
+            const oldStage = client.stage;
+            const newStage = detailStage.value;
+            if (oldStage !== newStage) {
+                recordStageHistory(client.id, oldStage, newStage, '手动');
+                client.stage = newStage;
+                saveData();
+                renderClientList();
+                renderDetail(client);
+            }
+        }
+    });
+
+    // 跟进
+    addFollowBtn.addEventListener('click', () => {
+        if (!currentClientId) { alert('请先选择一个钓场'); return; }
+        const content = followInput.value.trim();
+        if (!content) { alert('请输入跟进内容'); return; }
+        addFollow(currentClientId, content, followType.value);
+        followInput.value = '';
+    });
+    followInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (!currentClientId) { alert('请先选择一个钓场'); return; }
+            const content = followInput.value.trim();
+            if (!content) { alert('请输入跟进内容'); return; }
+            addFollow(currentClientId, content, followType.value);
+            followInput.value = '';
+        }
+    });
+
+    // 导出报表
+    exportBtn.addEventListener('click', exportReport);
+
+    // 数据看板
+    dashboardBtn.addEventListener('click', openDashboard);
+    dashboardCloseBtn.addEventListener('click', closeDashboard);
+    dashboardOverlay.addEventListener('click', (e) => {
+        if (e.target === dashboardOverlay) closeDashboard();
+    });
+
+    // 模态框
+    modalCancelBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    clientForm.addEventListener('submit', saveClient);
+
+    // ============================================================
+    //  初始化完整数据（包含1~47）
+    // ============================================================
+    function initFullData() {
+        // 此处将之前所有数据完整嵌入
+        const fullClients = [
+            { id: '1', name: '老虎坑钓鱼场', contact: '张朝胜', phone: '15902052205', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 1000, transRate: '0.30%', withdrawRate: '0.30%', paid: 0, unpaid: 0, contract: '-', gift: '喇叭+2 小票机+1 钓位码全送赠送', signingGift: '签约赠送全年广告位', address: '', note: '场次', stageHistory: [{ time: Date.now() - 86400000 * 30, from: '初步接触', to: '服务中', by: '系统自动' }] },
+            { id: '2', name: '金木鲢鳙钓鱼场', contact: '韦剑峰', phone: '18922105348', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 300, transRate: '0.30%', withdrawRate: '0.30%', paid: 0, unpaid: 650, contract: '-', gift: '钓位码全部赠送', signingGift: '赠送会员系统一年', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 20, from: '谈判', to: '服务中', by: '手动' }] },
+            { id: '3', name: '水口鹿岗休闲钓鱼场', contact: '陈秋香', phone: '15220590763', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 100, transRate: '0.35%', withdrawRate: '0.30%', paid: 373, unpaid: 0, contract: '-', gift: '喇叭+1 钓位码+20', signingGift: '物料支持', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 15, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '4', name: '四海钓场', contact: '郑腾达', phone: '18174210305', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 600, transRate: '0.30%', withdrawRate: '0.30%', paid: 0, unpaid: 0, contract: '-', gift: '喇叭+3 钓位码全部赠送', signingGift: '免费活动策划一次', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 10, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '5', name: '长岗鲢鳙钓场', contact: '王金天', phone: '13500007475', person: '温世佳', signed: '是', status: '待上线', stage: '初步接触', revenue: 600, transRate: '0.30%', withdrawRate: '0.30%', paid: 441, unpaid: 0, contract: '-', gift: '钓位码+20', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 5, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '6', name: '佛山聚鳙钓场', contact: '张磊', phone: '13620315615', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 1000, transRate: '0.35%', withdrawRate: '0.30%', paid: 360, unpaid: 0, contract: '-', gift: '钓位码全部赠送', signingGift: '赠送微信推广一次', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 25, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '7', name: '新大洋钓场', contact: '邹广财', phone: '13528844441', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 800, transRate: '0.35%', withdrawRate: '0.30%', paid: 378, unpaid: 0, contract: '-', gift: '钓位码全部赠送+三个大牌', signingGift: '广告位一年', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 18, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '8', name: '零一巨物鲢鳙钓鱼场', contact: '罗胜球', phone: '15876538884', person: '温世佳', signed: '是', status: '待上线', stage: '需求确认', revenue: 500, transRate: '0.35%', withdrawRate: '0.30%', paid: 700, unpaid: 0, contract: '-', gift: '-', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 3, from: '初步接触', to: '需求确认', by: '手动' }] },
+            { id: '9', name: '清湖钓场', contact: '樊宗文', phone: '13953731095', person: '温世佳', signed: '否', status: '终止', stage: '流失', revenue: null, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 40, from: '服务中', to: '流失', by: '系统自动' }] },
+            { id: '10', name: '非凡钓场', contact: '武艳', phone: '18126748014', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 800, transRate: '0.35%', withdrawRate: '0.30%', paid: 0, unpaid: 0, contract: '-', gift: '赠送一个大牌 喇叭+1', signingGift: '赠送智能硬件一套', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 12, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '11', name: '潮湾钓鱼场', contact: '王红宇', phone: '13794634569', person: '温世佳', signed: '是', status: '待上线', stage: '初步接触', revenue: 100, transRate: '0.35%', withdrawRate: '0.30%', paid: 0, unpaid: 0, contract: '-', gift: '喇叭+1 钓位码全部赠送', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 2, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '12', name: '大宝钓场', contact: '邱全宝', phone: '18933509431', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 60, transRate: '0.35%', withdrawRate: '0.30%', paid: 180, unpaid: 0, contract: '-', gift: '赠送钓位码', signingGift: '赠送鱼饵大礼包', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 8, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '13', name: '南山小李钓场', contact: '沈雨连', phone: '18922768987', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 400, transRate: '0.35%', withdrawRate: '0.30%', paid: 0, unpaid: 650, contract: '-', gift: '赠送钓位码', signingGift: '线上推广服务', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 7, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '14', name: '西布休闲钓场', contact: '吴小燕', phone: '13266333267', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 100, transRate: '0.35%', withdrawRate: '0.30%', paid: 0, unpaid: 0, contract: '-', gift: '喇叭+1 钓位码全部赠送', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 6, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '15', name: '远航钓鱼场', contact: '李海洋', phone: '18512001588', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 300, transRate: '0.35%', withdrawRate: '0.30%', paid: 0, unpaid: 650, contract: '-', gift: '钓位码全部赠送', signingGift: '赠送数据分析报告', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 9, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '16', name: '梦想钓场', contact: '侯一品', phone: '15920561630', person: '温世佳', signed: '是', status: '待上线', stage: '方案报价', revenue: 300, transRate: '0.35%', withdrawRate: '0.30%', paid: 0, unpaid: 0, contract: '-', gift: '喇叭+1 钓位码全部赠送', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 4, from: '需求确认', to: '方案报价', by: '手动' }] },
+            { id: '17', name: '聚鑫钓鱼场', contact: '', phone: '', person: '温世佳', signed: '是', status: '待上线', stage: '初步接触', revenue: 500, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '18', name: '龙东钓场', contact: '', phone: '', person: '温世佳', signed: '是', status: '待上线', stage: '初步接触', revenue: 300, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '19', name: '龙西钓场', contact: '', phone: '', person: '温世佳', signed: '是', status: '待上线', stage: '初步接触', revenue: 500, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '20', name: '老宋钓场', contact: '宋亚龙', phone: '13798876653', person: '温世佳', signed: '是', status: '待上线', stage: '谈判', revenue: 300, transRate: '0.35%', withdrawRate: '0.30%', paid: 0, unpaid: 0, contract: '-', gift: '赠送一个大喇叭+钓位码', signingGift: '额外赠送钓位码20个', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 3, from: '方案报价', to: '谈判', by: '手动' }] },
+            { id: '21', name: '方明钓场', contact: '', phone: '', person: '', signed: '否', status: '', stage: '初步接触', revenue: 100, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '22', name: '一品红钓场', contact: '王建朋', phone: '13539862409', person: '温世佳', signed: '是', status: '待上线', stage: '方案报价', revenue: 300, transRate: '0.35%', withdrawRate: '0.30%', paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 2, from: '需求确认', to: '方案报价', by: '手动' }] },
+            { id: '23', name: '均湖钓场', contact: '', phone: '', person: '温世佳', signed: '否', status: '', stage: '初步接触', revenue: 500, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '24', name: '大前鲢鳙钓场', contact: '黄偕伟', phone: '18820773378', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 300, transRate: '0.35%', withdrawRate: '0.30%', paid: 0, unpaid: 0, contract: '-', gift: '赠送一个大喇叭+钓位码', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 5, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '25', name: '嘉豪生态垂钓园鲢鳙塘', contact: '魏凯', phone: '15502592681', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 300, transRate: '0.35%', withdrawRate: '0.30%', paid: 899, unpaid: 0, contract: '-', gift: '赠送钓位码', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 4, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '26', name: '黄金钓鱼场', contact: '', phone: '', person: '温世佳', signed: '是', status: '待上线', stage: '初步接触', revenue: 100, transRate: '0.35%', withdrawRate: '0.30%', paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '27', name: '鹅城钓鱼场', contact: '江军', phone: '', person: '温世佳', signed: '是', status: '待上线', stage: '初步接触', revenue: 200, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '28', name: '滨海湾钓鱼场', contact: '刘正', phone: '15826611912', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 200, transRate: '0.35%', withdrawRate: '0.30%', paid: 160, unpaid: 0, contract: '', gift: '赠送钓位码', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 3, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '29', name: '悦宸垂钓基地', contact: '熊兴静', phone: '15217990011', person: '温世佳', signed: '是', status: '待上线', stage: '需求确认', revenue: 50, transRate: '0.35%', withdrawRate: '0.30%', paid: 0, unpaid: 0, contract: '', gift: '赠送一个大牌', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 2, from: '初步接触', to: '需求确认', by: '手动' }] },
+            { id: '30', name: '富友鲢鳙钓场', contact: '', phone: '', person: '温世佳', signed: '否', status: '', stage: '初步接触', revenue: 400, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '31', name: '云顶钓场', contact: '张恒', phone: '13710459929', person: '温世佳', signed: '是', status: '终止', stage: '流失', revenue: 400, transRate: '0.35%', withdrawRate: '0.30%', paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 20, from: '服务中', to: '流失', by: '系统自动' }] },
+            { id: '32', name: '318休闲大物', contact: '徐祥文', phone: '17520440800', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 100, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 2, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '33', name: '大伟钓鱼场', contact: '', phone: '', person: '温世佳', signed: '是', status: '待上线', stage: '方案报价', revenue: 500, transRate: '0.30%', withdrawRate: '0.30%', paid: null, unpaid: null, contract: '', gift: '赠送2个大喇叭+钓位码', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '需求确认', to: '方案报价', by: '手动' }] },
+            { id: '34', name: '先锋水库阿飞钓场', contact: '邱飞云', phone: '18607381688', person: '温世佳', signed: '是', status: '待上线', stage: '需求确认', revenue: 100, transRate: '0.35%', withdrawRate: '0.30%', paid: 0, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '初步接触', to: '需求确认', by: '手动' }] },
+            { id: '35', name: '天顺钓鱼场', contact: '吴创发', phone: '13059296862', person: '温世佳', signed: '是', status: '待上线', stage: '初步接触', revenue: 50, transRate: '0.35%', withdrawRate: '0.30%', paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '36', name: '猛攻钓场', contact: '', phone: '', person: '温世佳', signed: '是', status: '待上线', stage: '方案报价', revenue: 500, transRate: '0.38%', withdrawRate: '0.30%', paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '需求确认', to: '方案报价', by: '手动' }] },
+            { id: '37', name: '嘉豪生态垂钓园', contact: '罗东', phone: '18312108429', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 100, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 2, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '38', name: '老船长垂钓俱乐部', contact: '陈权', phone: '18925709235', person: '温世佳', signed: '是', status: '正常', stage: '服务中', revenue: 100, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 2, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '39', name: '水中星', contact: '', phone: '', person: '', signed: '是', status: '正常', stage: '服务中', revenue: null, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '签约', to: '服务中', by: '系统自动' }] },
+            { id: '40', name: '西安', contact: '', phone: '', person: '', signed: '否', status: '', stage: '初步接触', revenue: null, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '41', name: '东湖', contact: '', phone: '', person: '', signed: '否', status: '', stage: '初步接触', revenue: null, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '42', name: '聚鲤', contact: '', phone: '', person: '', signed: '否', status: '', stage: '初步接触', revenue: null, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '43', name: '建锅', contact: '', phone: '', person: '', signed: '否', status: '', stage: '初步接触', revenue: null, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '44', name: '十八亩', contact: '', phone: '', person: '', signed: '否', status: '', stage: '初步接触', revenue: null, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '45', name: '五一', contact: '', phone: '', person: '', signed: '否', status: '', stage: '初步接触', revenue: null, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] },
+            { id: '46', name: '常平老李', contact: '', phone: '', person: '', signed: '否', status: '正常', stage: '服务中', revenue: null, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '初步接触', to: '服务中', by: '系统自动' }] },
+            { id: '47', name: '狂狼', contact: '', phone: '', person: '', signed: '否', status: '', stage: '初步接触', revenue: null, transRate: null, withdrawRate: null, paid: null, unpaid: null, contract: '', gift: '', signingGift: '', address: '', note: '', stageHistory: [{ time: Date.now() - 86400000 * 1, from: '未知', to: '初步接触', by: '系统' }] }
+        ];
+        const follows = {
+            '1': [{ id: 'f1', content: '初次沟通，钓场运营良好', type: '电话', time: Date.now() - 86400000 * 2 }],
+            '2': [{ id: 'f2', content: '确认合同条款，预计下月续约', type: '微信', time: Date.now() - 86400000 * 1 }],
+            '3': [{ id: 'f3', content: '已支付部分款项，剩余待结', type: '其他', time: Date.now() - 3600000 * 5 }],
+            '4': [{ id: 'f4', content: '新钓位码已赠送，客户满意', type: '电话', time: Date.now() - 86400000 * 3 }],
+            '5': [{ id: 'f5', content: '待上线，设备调试中', type: '微信', time: Date.now() - 86400000 * 1 }],
+        };
+        return { clients: fullClients, follows: follows };
+    }
+
+    // 初始化
+    function init() {
+        // 加载数据，如果为空则使用完整数据
+        let raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                if (parsed.clients && parsed.clients.length > 0) {
+                    data = parsed;
+                    if (!data.follows) data.follows = {};
+                    data.clients.forEach(c => {
+                        if (!c.stage) c.stage = '初步接触';
+                        if (!c.signingGift) c.signingGift = '';
+                        if (!c.stageHistory || !Array.isArray(c.stageHistory)) c.stageHistory = [];
+                    });
+                } else {
+                    // 如果数据为空，则使用完整数据
+                    const full = initFullData();
+                    data = full;
+                    saveData();
+                }
+            } catch (_) {
+                const full = initFullData();
+                data = full;
+                saveData();
+            }
+        } else {
+            const full = initFullData();
+            data = full;
+            saveData();
+        }
+
+        // 检查是否有follows缺失
+        const ids = new Set(data.clients.map(c => c.id));
+        Object.keys(data.follows).forEach(id => {
+            if (!ids.has(id)) delete data.follows[id];
+        });
+
+        saveData();
+        renderClientList();
+        if (data.clients.length > 0) selectClient(data.clients[0].id);
+        else {
+            emptyDetail.style.display = 'flex';
+            detailContent.style.display = 'none';
+        }
+    }
+
+    // 启动
+    init();
+</script>
+</body>
+</html>
