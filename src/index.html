@@ -1,279 +1,2347 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工程移交验收表</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>招商经理工作台 · 新塘环宇广场</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
     <style>
-        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f8fc; padding: 30px; }
-        .container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 30px 40px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
-        h1 { color: #0b1a2e; border-bottom: 3px solid #f5c542; padding-bottom: 12px; }
-        .info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; background: #f8fbff; padding: 20px; border-radius: 10px; margin: 20px 0; }
-        .info .label { font-weight: 600; color: #2f4a6a; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th { background: #0b1a2e; color: #fff; padding: 10px; text-align: center; border: 1px solid #1a2f46; }
-        td { padding: 8px 10px; border: 1px solid #dde4ed; vertical-align: middle; }
-        .category { background: #eef4fc; font-weight: 700; text-align: center; }
-        .result { text-align: center; }
-        .result input { margin: 0 6px; }
-        .remark { border: none; border-bottom: 1px dashed #bacfe0; width: 100%; padding: 4px; }
-        .conclusion { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
-        .conclusion-box { border: 1px solid #e6edf5; border-radius: 10px; padding: 18px 22px; background: #fafcff; }
-        .conclusion-box textarea { width: 100%; border: 1px solid #dde4ed; border-radius: 6px; padding: 8px; min-height: 60px; font-family: inherit; }
-        .sign { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 30px 0 10px; border-top: 2px dashed #dce4ee; padding-top: 20px; }
-        .sign-item .line { border-bottom: 1px solid #b0c4d8; height: 30px; }
-        .sign-item .date { font-size: 13px; color: #5e7a9a; margin-top: 4px; }
-        .footer { margin-top: 20px; padding-top: 12px; border-top: 1px solid #e6edf5; font-size: 13px; color: #6a8aa8; display: flex; justify-content: space-between; flex-wrap: wrap; }
-        .btn { background: #f5c542; border: none; padding: 10px 30px; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 20px; }
-        .btn:hover { background: #e0b035; }
-        @media print { .btn { display: none; } }
+        /* ===== 全局 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        :root {
+            --primary: #1a4c8a;
+            --primary-light: #2a6cb8;
+            --primary-dark: #0f3460;
+            --sidebar-width: 220px;
+            --header-height: 60px;
+            --radius: 10px;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            --gray-50: #f8fafc;
+            --gray-100: #f1f4f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --green: #10b981;
+            --green-bg: #ecfdf5;
+            --red: #ef4444;
+            --red-bg: #fef2f2;
+            --yellow: #f59e0b;
+            --yellow-bg: #fffbeb;
+            --blue: #3b82f6;
+            --blue-bg: #eff6ff;
+            --purple: #8b5cf6;
+            --purple-bg: #f5f3ff;
+            --orange: #f97316;
+            --orange-bg: #fff7ed;
+        }
+        body {
+            background: var(--gray-50);
+            color: var(--gray-800);
+            display: flex;
+            min-height: 100vh;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 10px;
+        }
 
-        /* 让所有可编辑元素在获得焦点时显示提示边框（可选） */
-        [contenteditable="true"]:focus {
-            outline: 2px solid #f5c542;
-            outline-offset: 2px;
+        /* ===== 侧边栏 ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: #fff;
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            margin-bottom: 20px;
+        }
+        .sidebar-brand i {
+            font-size: 26px;
+            color: #ffd966;
+        }
+        .sidebar-brand h1 {
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .sidebar-brand small {
+            font-size: 10px;
+            opacity: 0.7;
+            display: block;
+        }
+        .sidebar-nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .sidebar-nav .nav-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            opacity: 0.5;
+            padding: 12px 12px 4px;
+            font-weight: 600;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 14px;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .sidebar-nav a i {
+            width: 20px;
+            font-size: 15px;
+            text-align: center;
+        }
+        .sidebar-nav a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+        .sidebar-nav a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+            box-shadow: inset 3px 0 0 #ffd966;
+        }
+        .sidebar-nav a .badge {
+            margin-left: auto;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 11px;
+            opacity: 0.5;
+            text-align: center;
+        }
+
+        /* ===== 主区域 ===== */
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ===== 顶栏 ===== */
+        .header {
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .header-left .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray-600);
+            cursor: pointer;
+        }
+        .header-left h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        .header-left .page-subtitle {
+            font-size: 13px;
+            color: var(--gray-400);
+            font-weight: 400;
+            margin-left: 4px;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header-right .date-display {
+            font-size: 13px;
+            color: var(--gray-500);
+            background: var(--gray-100);
+            padding: 5px 14px;
+            border-radius: 20px;
+        }
+        .header-right .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* ===== 内容区 ===== */
+        .content {
+            padding: 24px 28px 40px;
+            flex: 1;
+        }
+        .page {
+            display: none;
+            animation: fadeUp 0.25s ease;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== 卡片 & 统计 ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-100);
+            transition: transform 0.15s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: var(--gray-500);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-top: 4px;
+        }
+        .stat-card .sub {
+            font-size: 12px;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
+        .stat-card .icon-bg {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+        .stat-card .icon-bg.blue {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+        .stat-card .icon-bg.green {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+        .stat-card .icon-bg.orange {
+            background: var(--orange-bg);
+            color: var(--orange);
+        }
+        .stat-card .icon-bg.purple {
+            background: var(--purple-bg);
+            color: var(--purple);
+        }
+        .stat-card .icon-bg.red {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .card {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-100);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+        .card-body {
+            padding: 16px 20px;
+        }
+
+        /* ===== 任务列表 / 活动 ===== */
+        .task-list {
+            list-style: none;
+        }
+        .task-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-100);
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .task-list li:hover {
+            background: var(--gray-50);
+        }
+        .task-list li:last-child {
+            border-bottom: none;
+        }
+        .task-list .task-priority {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .task-list .task-priority.high {
+            background: var(--red);
+        }
+        .task-list .task-priority.medium {
+            background: var(--orange);
+        }
+        .task-list .task-priority.low {
+            background: var(--blue);
+        }
+        .task-list .task-text {
+            flex: 1;
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+        .task-list .task-text strong {
+            color: var(--gray-900);
+        }
+        .task-list .task-time {
+            font-size: 12px;
+            color: var(--gray-400);
+            white-space: nowrap;
+        }
+
+        /* ===== 表格 ===== */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        table th {
+            text-align: left;
+            padding: 10px 12px;
+            background: var(--gray-50);
+            color: var(--gray-600);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--gray-100);
+            vertical-align: middle;
+            color: var(--gray-700);
+        }
+        table tr:hover td {
+            background: var(--gray-50);
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-tag.意向 {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+        .status-tag.看场 {
+            background: var(--orange-bg);
+            color: var(--orange);
+        }
+        .status-tag.谈判 {
+            background: var(--purple-bg);
+            color: var(--purple);
+        }
+        .status-tag.签约 {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+        .status-tag.流失 {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+        .status-tag.已租 {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+        .status-tag.空置 {
+            background: var(--gray-100);
+            color: var(--gray-500);
+        }
+        .status-tag.待租 {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+        }
+        .status-tag.装修中 {
+            background: var(--orange-bg);
+            color: var(--orange);
+        }
+        .status-tag.A {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+        .status-tag.B {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+        .status-tag.C {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+        }
+        .status-tag.D {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+        .status-tag.overdue {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid var(--red);
+        }
+        .status-tag.today {
+            background: var(--orange-bg);
+            color: var(--orange);
+            border: 1px solid var(--orange);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+        .btn-sm {
+            padding: 3px 10px;
+            font-size: 12px;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-600);
+        }
+        .btn-outline:hover {
+            background: var(--gray-50);
+        }
+        .btn-success {
+            background: var(--green);
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-danger {
+            background: var(--red);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-ghost {
+            background: transparent;
+            color: var(--gray-500);
+            padding: 4px 8px;
+        }
+        .btn-ghost:hover {
+            background: var(--gray-100);
+        }
+        .btn-ghost .fa-edit {
+            color: var(--primary);
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .toolbar .search-box {
+            flex: 1;
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 0 12px;
+        }
+        .toolbar .search-box:focus-within {
+            border-color: var(--primary);
+        }
+        .toolbar .search-box i {
+            color: var(--gray-400);
+        }
+        .toolbar .search-box input {
+            border: none;
+            padding: 7px 10px;
+            font-size: 14px;
+            flex: 1;
+            outline: none;
+            background: transparent;
+            color: var(--gray-700);
+        }
+        .toolbar .filter-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .toolbar .filter-group select {
+            padding: 7px 12px;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 13px;
+            background: #fff;
+            color: var(--gray-700);
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* ===== 模态框 ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            border-radius: var(--radius);
+            max-width: 740px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: modalIn 0.2s ease;
+        }
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.96) translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h3 {
+            font-size: 17px;
+            font-weight: 600;
+        }
+        .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray-400);
+            cursor: pointer;
+        }
+        .modal-header .close-btn:hover {
+            color: var(--gray-700);
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .modal-footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 4px;
+        }
+        .form-group label .required {
+            color: var(--red);
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border 0.2s;
+            background: #fff;
+            color: var(--gray-700);
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 76, 138, 0.1);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .text-muted {
+            color: var(--gray-500);
+            font-size: 13px;
+        }
+        .mb-12 {
+            margin-bottom: 12px;
+        }
+        .mt-12 {
+            margin-top: 12px;
+        }
+        .flex {
+            display: flex;
+        }
+        .flex-center {
+            align-items: center;
+        }
+        .gap-8 {
+            gap: 8px;
+        }
+        .gap-12 {
+            gap: 12px;
+        }
+        .w-full {
+            width: 100%;
+        }
+        .flex-shrink-0 {
+            flex-shrink: 0;
+        }
+
+        /* ===== 租控简易 ===== */
+        .rental-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .rental-unit {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            border: 2px solid var(--gray-200);
+            transition: all 0.15s;
+            cursor: default;
+        }
+        .rental-unit .unit-no {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--gray-800);
+        }
+        .rental-unit .unit-area {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+        .rental-unit .unit-status {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .rental-unit.status-已租 {
+            border-color: var(--green);
+            background: var(--green-bg);
+        }
+        .rental-unit.status-空置 {
+            border-color: var(--gray-300);
+            background: #fff;
+        }
+        .rental-unit.status-待租 {
+            border-color: var(--yellow);
+            background: var(--yellow-bg);
+        }
+        .rental-unit.status-装修中 {
+            border-color: var(--orange);
+            background: var(--orange-bg);
+        }
+
+        /* ===== 跟进记录 - 对话框模式 ===== */
+        .followup-item {
+            background: var(--gray-50);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            border-left: 3px solid var(--blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .followup-item .fu-type {
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-right: 6px;
+        }
+        .followup-item .fu-time {
+            color: var(--gray-400);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .followup-item .fu-content {
+            flex: 1;
+        }
+        .followup-item .fu-schedule {
+            color: var(--orange);
+            font-size: 12px;
+            margin-left: 8px;
+            background: var(--orange-bg);
+            padding: 0 6px;
+            border-radius: 4px;
+        }
+
+        /* 聊天输入框 */
+        .chat-input-area {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid var(--gray-200);
+            transition: border 0.2s;
+        }
+        .chat-input-area:focus-within {
+            border-color: var(--primary);
+        }
+        .chat-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .chat-input-row select,
+        .chat-input-row input {
+            padding: 6px 10px;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 13px;
+            background: #fff;
+        }
+        .chat-input-row input[type="text"] {
+            flex: 1;
+            min-width: 120px;
+        }
+        .chat-input-row .btn {
+            padding: 6px 16px;
+        }
+        .chat-options-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .chat-options-row label {
+            font-size: 12px;
+            color: var(--gray-600);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+        .chat-options-row input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+        }
+        .chat-options-row select {
+            padding: 3px 8px;
+            border: 1px solid var(--gray-200);
+            border-radius: 4px;
+            font-size: 12px;
+            background: #fff;
+        }
+        .chat-options-row input[type="datetime-local"] {
+            padding: 3px 6px;
+            border: 1px solid var(--gray-200);
+            border-radius: 4px;
+            font-size: 12px;
+            background: #fff;
+        }
+
+        .template-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .template-dropdown .dropdown-menu {
+            display: none;
+            position: absolute;
+            bottom: 110%;
+            left: 0;
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+            z-index: 10;
+            min-width: 140px;
+            padding: 4px 0;
+        }
+        .template-dropdown .dropdown-menu.show {
+            display: block;
+        }
+        .template-dropdown .dropdown-menu div {
+            padding: 6px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--gray-700);
+        }
+        .template-dropdown .dropdown-menu div:hover {
+            background: var(--gray-100);
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 992px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .chat-input-row {
+                flex-wrap: wrap;
+            }
+            .chat-input-row input[type="text"] {
+                min-width: 100%;
+                order: 3;
+            }
+            .chat-input-row .btn {
+                order: 4;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main {
+                margin-left: 0;
+            }
+            .header-left .menu-toggle {
+                display: block;
+            }
+            .header {
+                padding: 0 16px;
+            }
+            .content {
+                padding: 16px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .header-left .page-subtitle {
+                display: none;
+            }
+            .header-right .date-display {
+                display: none;
+            }
+            .chat-options-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .modal {
+                margin: 10px;
+            }
+        }
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 999;
+        }
+        .sidebar-backdrop.show {
+            display: block;
+        }
+        .clickable {
+            cursor: pointer;
+        }
+        .export-btn {
+            background: var(--green);
+            color: #fff;
+        }
+        .export-btn:hover {
+            background: #059669;
+        }
+        /* 高亮 */
+        .highlight-overdue {
+            background: var(--red-bg) !important;
+            font-weight: 600;
+        }
+        .highlight-today {
+            background: var(--orange-bg) !important;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <!-- 标题可编辑 -->
-    <h1 contenteditable="true">环宇广场 · 物业办公室工程移交验收表</h1>
 
-    <!-- 项目信息，每个字段都可编辑 -->
-    <div class="info">
-        <div><span class="label">项目名称：</span><span contenteditable="true">增城环宇广场 · 招商中心办公室</span></div>
-        <div><span class="label">交付地点：</span><span contenteditable="true">新塘大道西521号 · A栋2层</span></div>
-        <div><span class="label">移交方（工程/物业）：</span><span contenteditable="true">工程部：张伟</span></div>
-        <div><span class="label">接收方（招商部）：</span><span contenteditable="true">招商部：李娜</span></div>
-        <div><span class="label">验收日期：</span><span contenteditable="true">2026年08月04日</span></div>
-        <div><span class="label">监理/见证方：</span><span contenteditable="true">行政部：王强</span></div>
+    <!-- ===== 侧边栏遮罩 ===== -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- ===== 侧边栏 ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-building"></i>
+            <div>
+                <h1>环宇广场</h1>
+                <small>招商经理 · 个人工作台</small>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">导航</div>
+            <a class="active" data-page="dashboard"><i class="fas fa-chart-pie"></i> 工作台</a>
+            <a data-page="clients"><i class="fas fa-users"></i> 客户管理 <span class="badge" id="clientCountBadge">0</span></a>
+            <a data-page="properties"><i class="fas fa-store"></i> 房源管理 <span class="badge" id="propertyCountBadge">0</span></a>
+            <div class="nav-label" style="margin-top:12px;">分析</div>
+            <a data-page="analytics"><i class="fas fa-chart-line"></i> 数据看板</a>
+        </nav>
+        <div class="sidebar-footer">
+            <i class="fas fa-circle" style="color:#4ade80;font-size:8px;margin-right:6px;"></i> 离线可用 · 本地存储
+        </div>
+    </aside>
+
+    <!-- ===== 主区域 ===== -->
+    <div class="main">
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+                <h2 id="pageTitle">工作台 <span class="page-subtitle">今日待办</span></h2>
+            </div>
+            <div class="header-right">
+                <span class="date-display" id="dateDisplay"></span>
+                <div class="avatar">梅</div>
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- ===== 工作台 ===== -->
+            <div class="page active" id="page-dashboard">
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="icon-bg blue"><i class="fas fa-user-clock"></i></div>
+                        <div class="label">今日待跟进</div>
+                        <div class="value" id="statTodayFollowup">0</div>
+                        <div class="sub">逾期未跟进 <span id="statOverdue">0</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-bg green"><i class="fas fa-user-check"></i></div>
+                        <div class="label">意向客户 (A/B)</div>
+                        <div class="value" id="statHighIntent">0</div>
+                        <div class="sub">总客户 <span id="statTotalClients">0</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-bg orange"><i class="fas fa-calendar-check"></i></div>
+                        <div class="label">本月跟进</div>
+                        <div class="value" id="statFollowupsMonth">0</div>
+                        <div class="sub">本月签约 <span id="statSigns">0</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-bg red"><i class="fas fa-door-open"></i></div>
+                        <div class="label">空置/待租房源</div>
+                        <div class="value" id="statVacantProps">0</div>
+                        <div class="sub">总面积 <span id="statVacantArea">0</span> ㎡</div>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tasks" style="color:var(--primary);margin-right:8px;"></i> 今日跟进任务</h3>
+                            <span class="text-muted">点击跳转</span>
+                        </div>
+                        <div class="card-body" style="max-height:300px;overflow-y:auto;">
+                            <ul class="task-list" id="todayTaskList">
+                                <li class="text-muted" style="justify-content:center;padding:20px 0;cursor:default;">✅ 今日无待办</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-history" style="color:var(--orange);margin-right:8px;"></i> 最近跟进动态</h3>
+                            <span class="text-muted">点击查看客户</span>
+                        </div>
+                        <div class="card-body" style="max-height:300px;overflow-y:auto;">
+                            <ul class="task-list" id="recentFollowupList">
+                                <li class="text-muted" style="justify-content:center;padding:20px 0;cursor:default;">暂无跟进</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 客户管理 ===== -->
+            <div class="page" id="page-clients">
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="clientSearch" placeholder="搜索公司、联系人..." />
+                    </div>
+                    <div class="filter-group">
+                        <select id="clientStageFilter">
+                            <option value="">全部阶段</option>
+                            <option value="意向">意向</option>
+                            <option value="看场">看场</option>
+                            <option value="谈判">谈判</option>
+                            <option value="签约">签约</option>
+                            <option value="流失">流失</option>
+                        </select>
+                        <select id="clientLevelFilter">
+                            <option value="">全部等级</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                        <button class="btn btn-primary" id="addClientBtn"><i class="fas fa-plus"></i> 添加客户</button>
+                        <button class="btn export-btn" id="exportClientBtn"><i class="fas fa-file-export"></i> 导出客户</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body" style="padding:0;">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>公司/品牌</th>
+                                        <th>联系人</th>
+                                        <th>电话</th>
+                                        <th>等级</th>
+                                        <th>需求业态</th>
+                                        <th>面积</th>
+                                        <th>阶段</th>
+                                        <th>下次跟进</th>
+                                        <th style="text-align:right;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientTableBody">
+                                    <tr><td colspan="9" class="text-muted" style="text-align:center;padding:30px 0;">暂无客户</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 房源管理 ===== -->
+            <div class="page" id="page-properties">
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="propertySearch" placeholder="搜索房号..." />
+                    </div>
+                    <div class="filter-group">
+                        <select id="propertyStatusFilter">
+                            <option value="">全部状态</option>
+                            <option value="空置">空置</option>
+                            <option value="待租">待租</option>
+                            <option value="已租">已租</option>
+                            <option value="装修中">装修中</option>
+                        </select>
+                        <button class="btn btn-primary" id="addPropertyBtn"><i class="fas fa-plus"></i> 添加房源</button>
+                    </div>
+                </div>
+                <div class="card mb-12">
+                    <div class="card-header">
+                        <h3><i class="fas fa-th" style="color:var(--primary);margin-right:8px;"></i> 租控概览（空置/待租优先）</h3>
+                        <span class="text-muted">点击单元查看</span>
+                    </div>
+                    <div class="card-body" id="rentalGridContainer">
+                        <div class="rental-grid" id="rentalGrid"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body" style="padding:0;">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>房号</th>
+                                        <th>楼层</th>
+                                        <th>面积 (㎡)</th>
+                                        <th>业态</th>
+                                        <th>状态</th>
+                                        <th>租金单价 (元/㎡/月)</th>
+                                        <th style="text-align:right;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="propertyTableBody">
+                                    <tr><td colspan="7" class="text-muted" style="text-align:center;padding:30px 0;">暂无房源</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 数据看板 ===== -->
+            <div class="page" id="page-analytics">
+                <div class="stats-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:24px;">
+                    <div class="stat-card">
+                        <div class="label">总客户</div>
+                        <div class="value" id="anaTotalClients">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">签约转化率</div>
+                        <div class="value" id="anaConversionRate">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">平均租金单价</div>
+                        <div class="value" id="anaAvgRent">0 <small style="font-size:14px;font-weight:400;color:var(--gray-400);">元/㎡</small></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">本月跟进总数</div>
+                        <div class="value" id="anaTotalFollowups">0</div>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div class="card full" style="grid-column:1/-1;">
+                        <div class="card-header"><h3>客户阶段分布</h3></div>
+                        <div class="card-body" style="padding:12px 24px 24px;"><canvas id="stageChart" height="150"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3>意向等级分布</h3></div>
+                        <div class="card-body" style="padding:12px 24px 24px;"><canvas id="levelChart" height="160"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3>渠道来源统计</h3></div>
+                        <div class="card-body" style="padding:12px 24px 24px;"><canvas id="sourceChart" height="160"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+
+    <!-- ========================================================= -->
+    <!-- 模态框：客户（集成对话框跟进） -->
+    <!-- ========================================================= -->
+    <div class="modal-overlay" id="clientModal">
+        <div class="modal" style="max-width:760px;">
+            <div class="modal-header">
+                <h3 id="clientModalTitle">客户详情</h3>
+                <button class="close-btn" data-close="clientModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="clientEditId" />
+                <!-- 基础信息 -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>公司/品牌 <span class="required">*</span></label>
+                        <input type="text" id="fCompany" placeholder="如：某某餐饮" />
+                    </div>
+                    <div class="form-group">
+                        <label>联系人 <span class="required">*</span></label>
+                        <input type="text" id="fContact" placeholder="姓名" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>电话 <span class="required">*</span></label>
+                        <input type="text" id="fPhone" placeholder="手机" />
+                    </div>
+                    <div class="form-group">
+                        <label>意向等级</label>
+                        <select id="fLevel">
+                            <option value="A">A (高意向)</option>
+                            <option value="B">B (中意向)</option>
+                            <option value="C">C (低意向)</option>
+                            <option value="D">D (无意向)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>需求业态</label>
+                        <select id="fDemandType">
+                            <option value="餐饮">餐饮</option>
+                            <option value="零售">零售</option>
+                            <option value="娱乐">娱乐</option>
+                            <option value="教育">教育</option>
+                            <option value="生活服务">生活服务</option>
+                            <option value="办公">办公</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>需求面积 (㎡)</label>
+                        <input type="number" id="fDemandArea" placeholder="如 120" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>跟进阶段</label>
+                        <select id="fStage">
+                            <option value="意向">意向</option>
+                            <option value="看场">看场</option>
+                            <option value="谈判">谈判</option>
+                            <option value="签约">签约</option>
+                            <option value="流失">流失</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>渠道来源</label>
+                        <select id="fSource">
+                            <option value="中介推荐">中介推荐</option>
+                            <option value="自然来访">自然来访</option>
+                            <option value="线上推广">线上推广</option>
+                            <option value="老客户介绍">老客户介绍</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <input type="text" id="fNotes" placeholder="客户特点等" />
+                </div>
+
+                <!-- 跟进记录 - 对话框模式 -->
+                <div style="border-top:1px solid var(--gray-200);padding-top:16px;margin-top:8px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <label style="font-weight:600;font-size:14px;color:var(--gray-700);"><i class="fas fa-comments" style="color:var(--blue);"></i> 跟进记录</label>
+                        <span class="text-muted" style="font-size:12px;">按时间倒序</span>
+                    </div>
+                    <!-- 跟进列表 -->
+                    <div id="followupListContainer" style="max-height:240px;overflow-y:auto;margin-bottom:12px;">
+                        <div class="text-muted" style="padding:8px 0;font-size:13px;">暂无跟进</div>
+                    </div>
+
+                    <!-- 聊天输入框 -->
+                    <div class="chat-input-area">
+                        <div class="chat-input-row">
+                            <select id="fFollowupType" style="width:auto;flex-shrink:0;">
+                                <option value="电话">📞 电话</option>
+                                <option value="面谈">🤝 面谈</option>
+                                <option value="带看">👀 带看</option>
+                                <option value="备注">📝 备注</option>
+                            </select>
+                            <div class="template-dropdown">
+                                <button class="btn btn-sm btn-outline" id="templateToggleBtn"><i class="fas fa-reply-all"></i> 模板</button>
+                                <div class="dropdown-menu" id="templateMenu">
+                                    <div data-template="初次问候，了解需求">初次问候</div>
+                                    <div data-template="已发送资料，等待反馈">发送资料</div>
+                                    <div data-template="约了看场时间，客户确认">约看场</div>
+                                    <div data-template="客户对租金有异议，需沟通">价格异议</div>
+                                    <div data-template="客户对位置满意，跟进意向">位置满意</div>
+                                </div>
+                            </div>
+                            <input type="text" id="fFollowupContent" placeholder="输入跟进内容..." style="flex:1;" />
+                            <button class="btn btn-primary" id="sendFollowupBtn"><i class="fas fa-paper-plane"></i> 发送</button>
+                        </div>
+                        <div class="chat-options-row">
+                            <label>
+                                <input type="checkbox" id="fScheduleNext" /> ⏰ 预约下次跟进
+                            </label>
+                            <input type="datetime-local" id="fNextFollowupTime" style="width:auto;flex:1;min-width:180px;" disabled />
+                            <select id="fFollowupProperty" style="width:auto;min-width:120px;">
+                                <option value="">无关联房源</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" data-close="clientModal">关闭</button>
+                <button class="btn btn-primary" id="saveClientBtn">保存客户信息</button>
+            </div>
+        </div>
     </div>
 
-    <h2 style="font-size:18px; margin:20px 0 10px;" contenteditable="true">📋 工程移交验收清单</h2>
-    <table>
-        <thead><tr><th>序号</th><th>检查项目</th><th>验收标准</th><th>验收结果</th><th>备注</th></tr></thead>
-        <tbody>
-            <!-- 类别行，所有文字可编辑 -->
-            <tr class="category"><td colspan="5" contenteditable="true">🏗️ 建筑结构 & 室内装饰</td></tr>
-            <tr>
-                <td contenteditable="true">1</td>
-                <td contenteditable="true">墙面平整度</td>
-                <td contenteditable="true">无裂缝、空鼓，涂料均匀</td>
-                <td class="result"><!-- 单选按钮不可编辑，但标签可以 -->
-                    <input type="radio" name="item1" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item1" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item1" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-            <tr>
-                <td contenteditable="true">2</td>
-                <td contenteditable="true">天花吊顶</td>
-                <td contenteditable="true">安装牢固，平整无变形</td>
-                <td class="result">
-                    <input type="radio" name="item2" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item2" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item2" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-            <tr>
-                <td contenteditable="true">3</td>
-                <td contenteditable="true">地面铺设</td>
-                <td contenteditable="true">地砖平整，无空鼓、划痕</td>
-                <td class="result">
-                    <input type="radio" name="item3" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item3" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item3" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-            <tr>
-                <td contenteditable="true">4</td>
-                <td contenteditable="true">门窗工程</td>
-                <td contenteditable="true">开关灵活，密封良好</td>
-                <td class="result">
-                    <input type="radio" name="item4" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item4" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item4" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-
-            <tr class="category"><td colspan="5" contenteditable="true">⚡ 电气系统 & 照明</td></tr>
-            <tr>
-                <td contenteditable="true">5</td>
-                <td contenteditable="true">配电箱 & 回路</td>
-                <td contenteditable="true">标识清晰，开关动作正常</td>
-                <td class="result">
-                    <input type="radio" name="item5" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item5" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item5" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-            <tr>
-                <td contenteditable="true">6</td>
-                <td contenteditable="true">插座 & 开关</td>
-                <td contenteditable="true">安装牢固，通电正常</td>
-                <td class="result">
-                    <input type="radio" name="item6" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item6" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item6" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-            <tr>
-                <td contenteditable="true">7</td>
-                <td contenteditable="true">照明灯具</td>
-                <td contenteditable="true">全部点亮，无频闪</td>
-                <td class="result">
-                    <input type="radio" name="item7" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item7" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item7" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-
-            <tr class="category"><td colspan="5" contenteditable="true">🌬️ 暖通空调 & 给排水</td></tr>
-            <tr>
-                <td contenteditable="true">8</td>
-                <td contenteditable="true">空调/新风系统</td>
-                <td contenteditable="true">制冷/制热正常，无漏水</td>
-                <td class="result">
-                    <input type="radio" name="item8" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item8" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item8" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-            <tr>
-                <td contenteditable="true">9</td>
-                <td contenteditable="true">给排水（水龙头/下水）</td>
-                <td contenteditable="true">水压正常，排水通畅</td>
-                <td class="result">
-                    <input type="radio" name="item9" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item9" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item9" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-
-            <tr class="category"><td colspan="5" contenteditable="true">🧯 消防设施 & 安全</td></tr>
-            <tr>
-                <td contenteditable="true">10</td>
-                <td contenteditable="true">灭火器 & 消防栓</td>
-                <td contenteditable="true">压力正常，配件齐全</td>
-                <td class="result">
-                    <input type="radio" name="item10" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item10" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item10" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-            <tr>
-                <td contenteditable="true">11</td>
-                <td contenteditable="true">应急照明 & 疏散指示</td>
-                <td contenteditable="true">点亮正常，方向正确</td>
-                <td class="result">
-                    <input type="radio" name="item11" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item11" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item11" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-
-            <tr class="category"><td colspan="5" contenteditable="true">📶 网络通信 & 弱电</td></tr>
-            <tr>
-                <td contenteditable="true">12</td>
-                <td contenteditable="true">网络端口 / 光纤</td>
-                <td contenteditable="true">面板到位，测通正常</td>
-                <td class="result">
-                    <input type="radio" name="item12" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item12" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item12" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-            <tr>
-                <td contenteditable="true">13</td>
-                <td contenteditable="true">门禁 / 监控</td>
-                <td contenteditable="true">门禁有效，监控清晰</td>
-                <td class="result">
-                    <input type="radio" name="item13" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item13" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item13" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-
-            <tr class="category"><td colspan="5" contenteditable="true">🪑 家具配置 & 环境卫生</td></tr>
-            <tr>
-                <td contenteditable="true">14</td>
-                <td contenteditable="true">办公家具（桌椅/柜）</td>
-                <td contenteditable="true">数量齐全，无松动</td>
-                <td class="result">
-                    <input type="radio" name="item14" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item14" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item14" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-            <tr>
-                <td contenteditable="true">15</td>
-                <td contenteditable="true">整体清洁度</td>
-                <td contenteditable="true">无灰尘、无建筑垃圾</td>
-                <td class="result">
-                    <input type="radio" name="item15" value="合格"><span contenteditable="true">合格</span>
-                    <input type="radio" name="item15" value="不合格"><span contenteditable="true">不合格</span>
-                    <input type="radio" name="item15" value="不适用"><span contenteditable="true">N/A</span>
-                </td>
-                <td><input class="remark" placeholder="问题描述"></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <!-- 验收结论 -->
-    <div class="conclusion">
-        <div class="conclusion-box">
-            <h4 contenteditable="true">✅ 验收结论</h4>
-            <label><input type="radio" name="final" value="通过"><span contenteditable="true">通过（同意接收）</span></label><br>
-            <label><input type="radio" name="final" value="有条件通过"><span contenteditable="true">有条件通过（整改后复验）</span></label><br>
-            <label><input type="radio" name="final" value="不通过"><span contenteditable="true">不通过（退回整改）</span></label>
-            <textarea placeholder="整改问题清单……"></textarea>
-        </div>
-        <div class="conclusion-box">
-            <h4 contenteditable="true">📝 移交清单 & 其他说明</h4>
-            <textarea placeholder="钥匙、门禁卡、说明书等……"></textarea>
+    <!-- ========================================================= -->
+    <!-- 模态框：房源 -->
+    <!-- ========================================================= -->
+    <div class="modal-overlay" id="propertyModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="propertyModalTitle">添加房源</h3>
+                <button class="close-btn" data-close="propertyModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="propertyEditId" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>房号 <span class="required">*</span></label>
+                        <input type="text" id="fUnitNo" placeholder="如 A-101" />
+                    </div>
+                    <div class="form-group">
+                        <label>楼层 <span class="required">*</span></label>
+                        <input type="text" id="fFloor" placeholder="如 1F" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>面积 (㎡) <span class="required">*</span></label>
+                        <input type="number" id="fArea" placeholder="如 120" />
+                    </div>
+                    <div class="form-group">
+                        <label>业态规划</label>
+                        <select id="fPropertyType">
+                            <option value="餐饮">餐饮</option>
+                            <option value="零售">零售</option>
+                            <option value="娱乐">娱乐</option>
+                            <option value="教育">教育</option>
+                            <option value="生活服务">生活服务</option>
+                            <option value="办公">办公</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="fPropertyStatus">
+                            <option value="空置">空置</option>
+                            <option value="待租">待租</option>
+                            <option value="已租">已租</option>
+                            <option value="装修中">装修中</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>租金单价 (元/㎡/月)</label>
+                        <input type="number" id="fRentPrice" placeholder="如 120" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="fPropertyNotes" rows="2" placeholder="房源特点..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" data-close="propertyModal">取消</button>
+                <button class="btn btn-primary" id="savePropertyBtn">保存</button>
+            </div>
         </div>
     </div>
 
-    <!-- 签署区域，所有文字可编辑 -->
-    <div class="sign">
-        <div class="sign-item">
-            <div class="line" contenteditable="true">移交方（工程/物业）：__________________</div>
-            <div class="date" contenteditable="true">日期：____年____月____日</div>
-        </div>
-        <div class="sign-item">
-            <div class="line" contenteditable="true">接收方（招商部）：__________________</div>
-            <div class="date" contenteditable="true">日期：____年____月____日</div>
-        </div>
-        <div class="sign-item">
-            <div class="line" contenteditable="true">监理/见证方：__________________</div>
-            <div class="date" contenteditable="true">日期：____年____月____日</div>
-        </div>
-    </div>
+    <script>
+        // =============================================================
+        // 数据层
+        // =============================================================
+        const STORAGE_KEY = 'huanyu_crm_v4';
 
-    <!-- 底部信息，可编辑 -->
-    <div class="footer">
-        <span contenteditable="true">📄 本表格一式三份，移交方、接收方、存档各执一份</span>
-        <span contenteditable="true">🏢 管理方：广州市协昌商业物业管理有限公司</span>
-        <span contenteditable="true">版本：V1.0 &nbsp;|&nbsp; 打印日期：2026-08-04</span>
-    </div>
+        const defaultData = {
+            clients: [{
+                id: 'c1',
+                company: '湘味楼餐饮',
+                contact: '张经理',
+                phone: '13800001111',
+                level: 'A',
+                demandType: '餐饮',
+                demandArea: 180,
+                stage: '签约',
+                source: '中介推荐',
+                notes: '已签约，装修中',
+                nextFollowup: '2026-08-20',
+                createTime: '2026-07-10'
+            }, {
+                id: 'c2',
+                company: '悦读时光书店',
+                contact: '李女士',
+                phone: '13900002222',
+                level: 'B',
+                demandType: '零售',
+                demandArea: 120,
+                stage: '谈判',
+                source: '自然来访',
+                notes: '对租金有异议',
+                nextFollowup: '2026-08-18',
+                createTime: '2026-07-15'
+            }, {
+                id: 'c3',
+                company: '星动健身',
+                contact: '王总',
+                phone: '13700003333',
+                level: 'A',
+                demandType: '娱乐',
+                demandArea: 350,
+                stage: '看场',
+                source: '中介推荐',
+                notes: '已看场两次',
+                nextFollowup: '2026-08-16',
+                createTime: '2026-07-20'
+            }, {
+                id: 'c4',
+                company: '小天才教育',
+                contact: '陈老师',
+                phone: '13600004444',
+                level: 'C',
+                demandType: '教育',
+                demandArea: 200,
+                stage: '意向',
+                source: '线上推广',
+                notes: '咨询价格',
+                nextFollowup: '2026-08-22',
+                createTime: '2026-07-25'
+            }, {
+                id: 'c5',
+                company: '优品生活超市',
+                contact: '刘总',
+                phone: '13500005555',
+                level: 'D',
+                demandType: '零售',
+                demandArea: 500,
+                stage: '流失',
+                source: '中介推荐',
+                notes: '已另选其他商场',
+                nextFollowup: null,
+                createTime: '2026-06-28'
+            }],
+            properties: [{
+                id: 'p1',
+                unitNo: 'A-101',
+                floor: '1F',
+                area: 120,
+                type: '零售',
+                status: '已租',
+                rentPrice: 150,
+                notes: '临街主入口'
+            }, {
+                id: 'p2',
+                unitNo: 'A-102',
+                floor: '1F',
+                area: 85,
+                type: '餐饮',
+                status: '空置',
+                rentPrice: 180,
+                notes: '靠近电梯'
+            }, {
+                id: 'p3',
+                unitNo: 'B-201',
+                floor: '2F',
+                area: 200,
+                type: '娱乐',
+                status: '待租',
+                rentPrice: 110,
+                notes: '视野开阔'
+            }, {
+                id: 'p4',
+                unitNo: 'B-202',
+                floor: '2F',
+                area: 150,
+                type: '教育',
+                status: '装修中',
+                rentPrice: 120,
+                notes: '预计8月完工'
+            }, {
+                id: 'p5',
+                unitNo: 'C-301',
+                floor: '3F',
+                area: 300,
+                type: '餐饮',
+                status: '已租',
+                rentPrice: 130,
+                notes: ''
+            }, {
+                id: 'p6',
+                unitNo: 'C-302',
+                floor: '3F',
+                area: 80,
+                type: '生活服务',
+                status: '空置',
+                rentPrice: 100,
+                notes: ''
+            }, {
+                id: 'p7',
+                unitNo: 'D-401',
+                floor: '4F',
+                area: 450,
+                type: '办公',
+                status: '已租',
+                rentPrice: 90,
+                notes: ''
+            }, {
+                id: 'p8',
+                unitNo: 'D-402',
+                floor: '4F',
+                area: 220,
+                type: '办公',
+                status: '待租',
+                rentPrice: 95,
+                notes: ''
+            }],
+            followups: [{
+                id: 'f1',
+                clientId: 'c1',
+                type: '电话',
+                content: '首次接触，了解需求',
+                time: '2026-07-10T10:30',
+                propertyId: ''
+            }, {
+                id: 'f2',
+                clientId: 'c1',
+                type: '带看',
+                content: '带看A-101，客户非常满意',
+                time: '2026-07-12T14:00',
+                propertyId: 'p1'
+            }, {
+                id: 'f3',
+                clientId: 'c1',
+                type: '备注',
+                content: '已签约，支付定金',
+                time: '2026-07-15T09:00',
+                propertyId: ''
+            }, {
+                id: 'f4',
+                clientId: 'c2',
+                type: '电话',
+                content: '初次来电咨询',
+                time: '2026-07-16T11:20',
+                propertyId: ''
+            }, {
+                id: 'f5',
+                clientId: 'c2',
+                type: '带看',
+                content: '带看B-202，对面积满意但租金偏高',
+                time: '2026-07-18T16:00',
+                propertyId: 'p4'
+            }, {
+                id: 'f6',
+                clientId: 'c3',
+                type: '面谈',
+                content: '中介推荐，意向强烈',
+                time: '2026-07-21T09:30',
+                propertyId: ''
+            }, {
+                id: 'f7',
+                clientId: 'c3',
+                type: '带看',
+                content: '带看B-201，对位置满意',
+                time: '2026-08-14T10:30',
+                propertyId: 'p3'
+            }, {
+                id: 'f8',
+                clientId: 'c4',
+                type: '线上',
+                content: '线上咨询，发送了资料',
+                time: '2026-07-26T08:40',
+                propertyId: ''
+            }, ]
+        };
 
-    <!-- 按钮不可编辑，保持功能 -->
-    <button class="btn" onclick="window.print()">🖨️ 打印 / 导出PDF</button>
-</div>
+        let followupIdCounter = 10;
+
+        function loadData() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    if (parsed.clients) window._clients = parsed.clients;
+                    if (parsed.properties) window._properties = parsed.properties;
+                    if (parsed.followups) { window._followups = parsed.followups;
+                        followupIdCounter = Math.max(...window._followups.map(f => parseInt(f.id.replace('f', ''))), 0) + 1; }
+                    return;
+                } catch (e) {}
+            }
+            window._clients = defaultData.clients;
+            window._properties = defaultData.properties;
+            window._followups = defaultData.followups;
+            followupIdCounter = Math.max(...window._followups.map(f => parseInt(f.id.replace('f', ''))), 0) + 1;
+            saveData();
+        }
+
+        function saveData() {
+            const data = {
+                clients: window._clients,
+                properties: window._properties,
+                followups: window._followups,
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            updateBadges();
+        }
+
+        function getClients() { return window._clients || []; }
+
+        function getProperties() { return window._properties || []; }
+
+        function getFollowups(clientId) {
+            return (window._followups || []).filter(f => f.clientId === clientId).sort((a, b) => b.time.localeCompare(a.time));
+        }
+
+        function getAllFollowups() { return window._followups || []; }
+
+        function getProperty(id) { return getProperties().find(p => p.id === id); }
+
+        function getClient(id) { return getClients().find(c => c.id === id); }
+
+        function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+        // 添加跟进 (同时支持预约)
+        function addFollowup(clientId, type, content, time, propertyId, scheduleTime) {
+            const f = { id: 'f' + (followupIdCounter++), clientId, type, content, time, propertyId: propertyId || '' };
+            window._followups.push(f);
+            // 如果预约了时间，更新客户的下次跟进
+            if (scheduleTime) {
+                const client = getClient(clientId);
+                if (client) {
+                    client.nextFollowup = scheduleTime.slice(0, 10); // 只存日期
+                }
+            }
+            saveData();
+            return f;
+        }
+
+        // =============================================================
+        // UI 更新
+        // =============================================================
+        function updateBadges() {
+            document.getElementById('clientCountBadge').textContent = getClients().length;
+            document.getElementById('propertyCountBadge').textContent = getProperties().length;
+        }
+
+        function renderDashboard() {
+            const clients = getClients();
+            const props = getProperties();
+            const followups = getAllFollowups();
+
+            const today = new Date().toISOString().slice(0, 10);
+            const overdue = clients.filter(c => c.nextFollowup && c.nextFollowup < today && c.stage !== '签约' && c.stage !==
+            '流失');
+            const todayFollowup = clients.filter(c => c.nextFollowup === today && c.stage !== '签约' && c.stage !== '流失');
+            document.getElementById('statTodayFollowup').textContent = todayFollowup.length;
+            document.getElementById('statOverdue').textContent = overdue.length;
+
+            const highIntent = clients.filter(c => (c.level === 'A' || c.level === 'B') && c.stage !== '流失');
+            document.getElementById('statHighIntent').textContent = highIntent.length;
+            document.getElementById('statTotalClients').textContent = clients.length;
+
+            const now = new Date();
+            const month = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+            const monthFollowups = followups.filter(f => f.time && f.time.startsWith(month));
+            document.getElementById('statFollowupsMonth').textContent = monthFollowups.length;
+            const monthSigns = clients.filter(c => c.stage === '签约' && c.createTime && c.createTime.startsWith(month));
+            document.getElementById('statSigns').textContent = monthSigns.length;
+
+            const vacant = props.filter(p => p.status === '空置' || p.status === '待租');
+            document.getElementById('statVacantProps').textContent = vacant.length;
+            const vacantArea = vacant.reduce((s, p) => s + p.area, 0);
+            document.getElementById('statVacantArea').textContent = vacantArea;
+
+            // 今日任务列表 (排序: 逾期 > 今日 > 未来)
+            const taskList = document.getElementById('todayTaskList');
+            const tasks = [];
+            overdue.forEach(c => {
+                tasks.push({ client: c, priority: 'high', label: `逾期跟进: ${c.company} (原定 ${c.nextFollowup})` });
+            });
+            todayFollowup.forEach(c => {
+                tasks.push({ client: c, priority: 'medium', label: `今日跟进: ${c.company}` });
+            });
+            // 未来3天
+            const future = new Date();
+            future.setDate(future.getDate() + 3);
+            const futureStr = future.toISOString().slice(0, 10);
+            const upcoming = clients.filter(c => c.nextFollowup && c.nextFollowup > today && c.nextFollowup <= futureStr &&
+                c.stage !== '签约' && c.stage !== '流失');
+            upcoming.forEach(c => {
+                tasks.push({ client: c, priority: 'low', label: `即将跟进: ${c.company} (${c.nextFollowup})` });
+            });
+
+            if (tasks.length === 0) {
+                taskList.innerHTML = '<li class="text-muted" style="justify-content:center;padding:20px 0;cursor:default;">✅ 今日无待办</li>';
+            } else {
+                taskList.innerHTML = tasks.map(t =>
+                    `<li onclick="navigateToClient('${t.client.id}')">
+                                <span class="task-priority ${t.priority}"></span>
+                                <span class="task-text"><strong>${t.client.company}</strong> · ${t.label}</span>
+                                <span class="task-time">${t.client.nextFollowup || ''}</span>
+                            </li>`
+                ).join('');
+            }
+
+            // 最近跟进动态
+            const recent = followups.sort((a, b) => b.time.localeCompare(a.time)).slice(0, 6);
+            const followList = document.getElementById('recentFollowupList');
+            if (recent.length === 0) {
+                followList.innerHTML = '<li class="text-muted" style="justify-content:center;padding:20px 0;cursor:default;">暂无跟进</li>';
+            } else {
+                followList.innerHTML = recent.map(f => {
+                    const client = getClient(f.clientId);
+                    const prop = f.propertyId ? getProperty(f.propertyId) : null;
+                    return `<li onclick="navigateToClient('${f.clientId}')">
+                                <span class="task-priority" style="background:var(--blue);"></span>
+                                <span class="task-text"><strong>${client ? client.company : '已删除'}</strong> 
+                                ${f.type} · ${f.content} ${prop ? ' (房源 '+prop.unitNo+')' : ''}</span>
+                                <span class="task-time">${f.time ? f.time.replace('T',' ') : ''}</span>
+                            </li>`;
+                }).join('');
+            }
+        }
+
+        function navigateToClient(clientId) {
+            navigateTo('clients');
+            setTimeout(() => { openClientModal(clientId); }, 100);
+        }
+
+        // 客户列表 (带高亮)
+        function renderClients() {
+            const tbody = document.getElementById('clientTableBody');
+            let list = getClients();
+            const search = document.getElementById('clientSearch').value.trim().toLowerCase();
+            const stage = document.getElementById('clientStageFilter').value;
+            const level = document.getElementById('clientLevelFilter').value;
+            if (search) {
+                list = list.filter(c => c.company.toLowerCase().includes(search) || c.contact.toLowerCase().includes(search));
+            }
+            if (stage) list = list.filter(c => c.stage === stage);
+            if (level) list = list.filter(c => c.level === level);
+
+            const today = new Date().toISOString().slice(0, 10);
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-muted" style="text-align:center;padding:30px 0;">暂无客户</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = list.map(c => {
+                let nextClass = '';
+                let nextDisplay = c.nextFollowup || '-';
+                if (c.nextFollowup && c.stage !== '签约' && c.stage !== '流失') {
+                    if (c.nextFollowup < today) { nextClass = 'status-tag overdue';
+                        nextDisplay = c.nextFollowup + ' ⚠️'; } else if (c.nextFollowup === today) { nextClass =
+                            'status-tag today';
+                        nextDisplay = c.nextFollowup + ' 🔔'; }
+                }
+                return `<tr>
+                            <td><strong>${c.company}</strong></td>
+                            <td>${c.contact}</td>
+                            <td>${c.phone}</td>
+                            <td><span class="status-tag ${c.level || 'C'}">${c.level || '-'}</span></td>
+                            <td><span class="status-tag" style="background:var(--blue-bg);color:var(--blue);">${c.demandType || '-'}</span></td>
+                            <td>${c.demandArea ? c.demandArea+'㎡' : '-'}</td>
+                            <td><span class="status-tag ${c.stage}">${c.stage || '意向'}</span></td>
+                            <td>${nextClass ? `<span class="${nextClass}">${nextDisplay}</span>` : nextDisplay}</td>
+                            <td style="text-align:right;white-space:nowrap;">
+                                <button class="btn btn-ghost btn-sm" onclick="openClientModal('${c.id}')" title="编辑/跟进"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-ghost btn-sm" onclick="deleteClient('${c.id}')" title="删除" style="color:var(--red);"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+            }).join('');
+        }
+
+        // 房源
+        function renderProperties() {
+            const tbody = document.getElementById('propertyTableBody');
+            let list = getProperties();
+            const search = document.getElementById('propertySearch').value.trim().toLowerCase();
+            const status = document.getElementById('propertyStatusFilter').value;
+            if (search) list = list.filter(p => p.unitNo.toLowerCase().includes(search));
+            if (status) list = list.filter(p => p.status === status);
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-muted" style="text-align:center;padding:30px 0;">暂无房源</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = list.map(p => `
+                        <tr>
+                            <td><strong>${p.unitNo}</strong></td>
+                            <td>${p.floor}</td>
+                            <td>${p.area}</td>
+                            <td><span class="status-tag" style="background:var(--blue-bg);color:var(--blue);">${p.type || '-'}</span></td>
+                            <td><span class="status-tag ${p.status}">${p.status}</span></td>
+                            <td>${p.rentPrice || '-'}</td>
+                            <td style="text-align:right;white-space:nowrap;">
+                                <button class="btn btn-ghost btn-sm" onclick="editProperty('${p.id}')" title="编辑"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-ghost btn-sm" onclick="deleteProperty('${p.id}')" title="删除" style="color:var(--red);"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+            renderRentalGrid();
+        }
+
+        function renderRentalGrid() {
+            const container = document.getElementById('rentalGrid');
+            let list = getProperties().filter(p => p.status !== '已租');
+            if (list.length === 0) {
+                container.innerHTML = '<div class="text-muted" style="padding:16px;text-align:center;">所有房源已租出 🎉</div>';
+                return;
+            }
+            container.innerHTML = list.map(p => `
+                        <div class="rental-unit status-${p.status}" title="${p.unitNo} | ${p.area}㎡ | ${p.status}">
+                            <div class="unit-no">${p.unitNo}</div>
+                            <div class="unit-area">${p.area}㎡</div>
+                            <div class="unit-status">${p.status}</div>
+                        </div>
+                    `).join('');
+        }
+
+        // =============================================================
+        // 客户模态框 - 对话框跟进
+        // =============================================================
+        let currentClientId = null;
+
+        function openClientModal(id) {
+            const client = id ? getClient(id) : null;
+            currentClientId = id || null;
+            document.getElementById('clientModalTitle').textContent = client ? `编辑客户 - ${client.company}` : '添加客户';
+            document.getElementById('clientEditId').value = id || '';
+
+            if (client) {
+                document.getElementById('fCompany').value = client.company || '';
+                document.getElementById('fContact').value = client.contact || '';
+                document.getElementById('fPhone').value = client.phone || '';
+                document.getElementById('fLevel').value = client.level || 'C';
+                document.getElementById('fDemandType').value = client.demandType || '餐饮';
+                document.getElementById('fDemandArea').value = client.demandArea || '';
+                document.getElementById('fStage').value = client.stage || '意向';
+                document.getElementById('fSource').value = client.source || '其他';
+                document.getElementById('fNotes').value = client.notes || '';
+            } else {
+                document.getElementById('fCompany').value = '';
+                document.getElementById('fContact').value = '';
+                document.getElementById('fPhone').value = '';
+                document.getElementById('fLevel').value = 'C';
+                document.getElementById('fDemandType').value = '餐饮';
+                document.getElementById('fDemandArea').value = '';
+                document.getElementById('fStage').value = '意向';
+                document.getElementById('fSource').value = '其他';
+                document.getElementById('fNotes').value = '';
+            }
+
+            renderFollowups(id);
+            populateFollowupPropertySelect();
+            // 重置对话框
+            document.getElementById('fFollowupContent').value = '';
+            document.getElementById('fScheduleNext').checked = false;
+            document.getElementById('fNextFollowupTime').disabled = true;
+            document.getElementById('fNextFollowupTime').value = '';
+            document.getElementById('clientModal').classList.add('show');
+        }
+
+        function renderFollowups(clientId) {
+            const container = document.getElementById('followupListContainer');
+            const items = clientId ? getFollowups(clientId) : [];
+            if (items.length === 0) {
+                container.innerHTML = '<div class="text-muted" style="padding:8px 0;font-size:13px;">暂无跟进记录，开始第一条吧</div>';
+                return;
+            }
+            container.innerHTML = items.map(f => {
+                const prop = f.propertyId ? getProperty(f.propertyId) : null;
+                const hasSchedule = f.time && f.time.includes('预约');
+                return `<div class="followup-item">
+                            <div class="fu-content">
+                                <span class="fu-type">[${f.type}]</span>
+                                ${f.content} ${prop ? ' (房源 '+prop.unitNo+')' : ''}
+                                ${hasSchedule ? '<span class="fu-schedule">⏰ 已预约</span>' : ''}
+                            </div>
+                            <span class="fu-time">${f.time ? f.time.replace('T',' ') : ''}</span>
+                        </div>`;
+            }).join('');
+        }
+
+        function populateFollowupPropertySelect() {
+            const select = document.getElementById('fFollowupProperty');
+            const props = getProperties();
+            select.innerHTML = '<option value="">无关联房源</option>' +
+                props.map(p => `<option value="${p.id}">${p.unitNo} (${p.area}㎡)</option>`).join('');
+        }
+
+        // 预约复选框控制
+        document.getElementById('fScheduleNext').addEventListener('change', function() {
+            const dt = document.getElementById('fNextFollowupTime');
+            dt.disabled = !this.checked;
+            if (this.checked && !dt.value) {
+                const now = new Date();
+                now.setHours(now.getHours() + 2);
+                dt.value = now.toISOString().slice(0, 16);
+            }
+        });
+
+        // 模板功能
+        document.getElementById('templateToggleBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('templateMenu').classList.toggle('show');
+        });
+        document.addEventListener('click', function() {
+            document.getElementById('templateMenu').classList.remove('show');
+        });
+        document.querySelectorAll('#templateMenu div').forEach(el => {
+            el.addEventListener('click', function() {
+                document.getElementById('fFollowupContent').value = this.dataset.template;
+                document.getElementById('templateMenu').classList.remove('show');
+                document.getElementById('fFollowupContent').focus();
+            });
+        });
+
+        // 发送跟进 (对话框模式)
+        function sendFollowup() {
+            const clientId = document.getElementById('clientEditId').value;
+            if (!clientId) { alert('请先保存客户基本信息再添加跟进'); return; }
+            const type = document.getElementById('fFollowupType').value;
+            const content = document.getElementById('fFollowupContent').value.trim();
+            const propertyId = document.getElementById('fFollowupProperty').value;
+            let scheduleTime = null;
+            if (document.getElementById('fScheduleNext').checked) {
+                scheduleTime = document.getElementById('fNextFollowupTime').value;
+                if (!scheduleTime) { alert('请选择预约时间'); return; }
+            }
+            if (!content) { alert('请输入跟进内容'); return; }
+            const now = new Date();
+            const timeStr = now.toISOString().slice(0, 16);
+            addFollowup(clientId, type, content, timeStr, propertyId, scheduleTime);
+            renderFollowups(clientId);
+            document.getElementById('fFollowupContent').value = '';
+            document.getElementById('fScheduleNext').checked = false;
+            document.getElementById('fNextFollowupTime').disabled = true;
+            document.getElementById('fNextFollowupTime').value = '';
+            renderDashboard();
+            renderClients(); // 更新高亮
+        }
+
+        document.getElementById('sendFollowupBtn').addEventListener('click', sendFollowup);
+        document.getElementById('fFollowupContent').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault();
+                sendFollowup(); }
+        });
+
+        // 保存客户
+        document.getElementById('saveClientBtn').addEventListener('click', function() {
+            const editId = document.getElementById('clientEditId').value;
+            const company = document.getElementById('fCompany').value.trim();
+            const contact = document.getElementById('fContact').value.trim();
+            const phone = document.getElementById('fPhone').value.trim();
+            if (!company || !contact || !phone) {
+                alert('请填写公司、联系人和电话');
+                return;
+            }
+            const data = {
+                company,
+                contact,
+                phone,
+                level: document.getElementById('fLevel').value,
+                demandType: document.getElementById('fDemandType').value,
+                demandArea: parseFloat(document.getElementById('fDemandArea').value) || 0,
+                stage: document.getElementById('fStage').value,
+                // 保留原有的nextFollowup，但可以被跟进覆盖
+                nextFollowup: document.getElementById('fClientNextFollowupHidden')?.value || null,
+                source: document.getElementById('fSource').value,
+                notes: document.getElementById('fNotes').value.trim(),
+                createTime: new Date().toISOString().slice(0, 10),
+            };
+            // 获取当前客户已有的nextFollowup
+            const existing = getClient(editId);
+            if (existing) data.nextFollowup = existing.nextFollowup;
+
+            if (editId) {
+                const idx = window._clients.findIndex(c => c.id === editId);
+                if (idx !== -1) { window._clients[idx] = { ...window._clients[idx], ...data }; }
+            } else {
+                data.id = generateId();
+                window._clients.push(data);
+            }
+            saveData();
+            document.getElementById('clientModal').classList.remove('show');
+            renderClients();
+            renderDashboard();
+        });
+
+        // 删除客户
+        function deleteClient(id) {
+            if (!confirm('确定删除该客户？')) return;
+            window._clients = getClients().filter(c => c.id !== id);
+            window._followups = (window._followups || []).filter(f => f.clientId !== id);
+            saveData();
+            renderClients();
+            renderDashboard();
+        }
+
+        // 房源编辑/删除
+        function editProperty(id) {
+            const p = getProperty(id);
+            if (!p) return;
+            document.getElementById('propertyModalTitle').textContent = '编辑房源';
+            document.getElementById('propertyEditId').value = id;
+            document.getElementById('fUnitNo').value = p.unitNo || '';
+            document.getElementById('fFloor').value = p.floor || '';
+            document.getElementById('fArea').value = p.area || '';
+            document.getElementById('fPropertyType').value = p.type || '餐饮';
+            document.getElementById('fPropertyStatus').value = p.status || '空置';
+            document.getElementById('fRentPrice').value = p.rentPrice || '';
+            document.getElementById('fPropertyNotes').value = p.notes || '';
+            document.getElementById('propertyModal').classList.add('show');
+        }
+
+        function deleteProperty(id) {
+            if (!confirm('确定删除该房源？')) return;
+            window._properties = getProperties().filter(p => p.id !== id);
+            saveData();
+            renderProperties();
+            renderDashboard();
+        }
+
+        document.getElementById('addPropertyBtn').addEventListener('click', function() {
+            document.getElementById('propertyModalTitle').textContent = '添加房源';
+            document.getElementById('propertyEditId').value = '';
+            document.getElementById('fUnitNo').value = '';
+            document.getElementById('fFloor').value = '';
+            document.getElementById('fArea').value = '';
+            document.getElementById('fPropertyType').value = '餐饮';
+            document.getElementById('fPropertyStatus').value = '空置';
+            document.getElementById('fRentPrice').value = '';
+            document.getElementById('fPropertyNotes').value = '';
+            document.getElementById('propertyModal').classList.add('show');
+        });
+
+        document.getElementById('savePropertyBtn').addEventListener('click', function() {
+            const editId = document.getElementById('propertyEditId').value;
+            const unitNo = document.getElementById('fUnitNo').value.trim();
+            const floor = document.getElementById('fFloor').value.trim();
+            const area = parseFloat(document.getElementById('fArea').value);
+            if (!unitNo || !floor || !area) {
+                alert('请填写房号、楼层和面积');
+                return;
+            }
+            const data = {
+                unitNo,
+                floor,
+                area,
+                type: document.getElementById('fPropertyType').value,
+                status: document.getElementById('fPropertyStatus').value,
+                rentPrice: parseFloat(document.getElementById('fRentPrice').value) || 0,
+                notes: document.getElementById('fPropertyNotes').value.trim(),
+            };
+            if (editId) {
+                const idx = window._properties.findIndex(p => p.id === editId);
+                if (idx !== -1) { window._properties[idx] = { ...window._properties[idx], ...data }; }
+            } else {
+                data.id = generateId();
+                window._properties.push(data);
+            }
+            saveData();
+            document.getElementById('propertyModal').classList.remove('show');
+            renderProperties();
+            renderDashboard();
+        });
+
+        // =============================================================
+        // 导出客户数据 (CSV)
+        // =============================================================
+        document.getElementById('exportClientBtn').addEventListener('click', function() {
+            const clients = getClients();
+            if (clients.length === 0) { alert('暂无客户数据可导出'); return; }
+            let list = [...clients];
+            const search = document.getElementById('clientSearch').value.trim().toLowerCase();
+            const stage = document.getElementById('clientStageFilter').value;
+            const level = document.getElementById('clientLevelFilter').value;
+            if (search) list = list.filter(c => c.company.toLowerCase().includes(search) || c.contact.toLowerCase()
+            .includes(search));
+            if (stage) list = list.filter(c => c.stage === stage);
+            if (level) list = list.filter(c => c.level === level);
+            if (list.length === 0) { alert('当前筛选条件下无客户可导出'); return; }
+
+            const headers = ['公司/品牌', '联系人', '电话', '意向等级', '需求业态', '需求面积(㎡)', '跟进阶段', '下次跟进时间', '渠道来源', '备注',
+                '创建日期'
+            ];
+            const rows = list.map(c => [
+                c.company || '', c.contact || '', c.phone || '', c.level || '', c.demandType || '',
+                c.demandArea || '', c.stage || '', c.nextFollowup || '', c.source || '', c.notes || '',
+                c.createTime || ''
+            ]);
+
+            let csv = '\uFEFF' + headers.join(',') + '\n';
+            rows.forEach(row => {
+                csv += row.map(field => {
+                    if (typeof field === 'string' && (field.includes(',') || field.includes('"'))) {
+                        return '"' + field.replace(/"/g, '""') + '"';
+                    }
+                    return field;
+                }).join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `客户数据_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        });
+
+        // =============================================================
+        // 图表 (数据分析)
+        // =============================================================
+        let stageChartInst = null,
+            levelChartInst = null,
+            sourceChartInst = null;
+
+        function renderAnalytics() {
+            const clients = getClients();
+            const props = getProperties();
+            const followups = getAllFollowups();
+            document.getElementById('anaTotalClients').textContent = clients.length;
+            const signed = clients.filter(c => c.stage === '签约').length;
+            document.getElementById('anaConversionRate').textContent = clients.length ? Math.round(signed / clients.length *
+                100) + '%' : '0%';
+            const rentedProps = props.filter(p => p.status === '已租');
+            const avg = rentedProps.length ? Math.round(rentedProps.reduce((s, p) => s + (p.rentPrice || 0), 0) / rentedProps
+                .length) : 0;
+            document.getElementById('anaAvgRent').innerHTML = avg +
+                ' <small style="font-size:14px;font-weight:400;color:var(--gray-400);">元/㎡</small>';
+            document.getElementById('anaTotalFollowups').textContent = followups.length;
+
+            const stageMap = {};
+            clients.forEach(c => { const s = c.stage || '意向';
+                stageMap[s] = (stageMap[s] || 0) + 1; });
+            const stageLabels = Object.keys(stageMap);
+            const stageData = Object.values(stageMap);
+            const colors = ['#3b82f6', '#f59e0b', '#8b5cf6', '#10b981', '#ef4444'];
+            if (stageChartInst) stageChartInst.destroy();
+            stageChartInst = new Chart(document.getElementById('stageChart'), {
+                type: 'bar',
+                data: { labels: stageLabels, datasets: [{ label: '客户数', data: stageData,
+                        backgroundColor: colors.slice(0, stageLabels.length), borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } } } }
+            });
+
+            const levelMap = { A: 0, B: 0, C: 0, D: 0 };
+            clients.forEach(c => { if (c.level && levelMap[c.level] !== undefined) levelMap[c.level]++; });
+            const levelLabels = Object.keys(levelMap);
+            const levelData = Object.values(levelMap);
+            const levelColors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
+            if (levelChartInst) levelChartInst.destroy();
+            levelChartInst = new Chart(document.getElementById('levelChart'), {
+                type: 'doughnut',
+                data: { labels: levelLabels, datasets: [{ data: levelData, backgroundColor: levelColors }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            const srcMap = {};
+            clients.forEach(c => { const s = c.source || '其他';
+                srcMap[s] = (srcMap[s] || 0) + 1; });
+            const srcLabels = Object.keys(srcMap);
+            const srcData = Object.values(srcMap);
+            if (sourceChartInst) sourceChartInst.destroy();
+            sourceChartInst = new Chart(document.getElementById('sourceChart'), {
+                type: 'bar',
+                data: { labels: srcLabels, datasets: [{ label: '客户数', data: srcData, backgroundColor: '#8b5cf6',
+                        borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } } } }
+            });
+        }
+
+        // =============================================================
+        // 导航 & 交互
+        // =============================================================
+        let pendingClientId = null;
+
+        function navigateTo(page) {
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.sidebar-nav a').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById('page-' + page);
+            if (target) target.classList.add('active');
+            const link = document.querySelector(`.sidebar-nav a[data-page="${page}"]`);
+            if (link) link.classList.add('active');
+
+            const titles = {
+                dashboard: '工作台',
+                clients: '客户管理',
+                properties: '房源管理',
+                analytics: '数据看板'
+            };
+            document.getElementById('pageTitle').innerHTML = titles[page] + ' <span class="page-subtitle">' + (page ===
+                'dashboard' ? '今日待办' : '') + '</span>';
+
+            if (page === 'dashboard') renderDashboard();
+            else if (page === 'clients') {
+                renderClients();
+                if (pendingClientId) {
+                    setTimeout(() => { openClientModal(pendingClientId);
+                        pendingClientId = null; }, 150);
+                }
+            } else if (page === 'properties') renderProperties();
+            else if (page === 'analytics') renderAnalytics();
+            closeSidebar();
+        }
+
+        document.querySelectorAll('.sidebar-nav a').forEach(el => {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo(this.dataset.page);
+            });
+        });
+
+        document.getElementById('clientSearch').addEventListener('input', renderClients);
+        document.getElementById('clientStageFilter').addEventListener('change', renderClients);
+        document.getElementById('clientLevelFilter').addEventListener('change', renderClients);
+        document.getElementById('propertySearch').addEventListener('input', renderProperties);
+        document.getElementById('propertyStatusFilter').addEventListener('change', renderProperties);
+
+        document.querySelectorAll('[data-close]').forEach(el => {
+            el.addEventListener('click', function() {
+                document.getElementById(this.dataset.close).classList.remove('show');
+            });
+        });
+        document.querySelectorAll('.modal-overlay').forEach(el => {
+            el.addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('show');
+            });
+        });
+
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarBackdrop').classList.toggle('show');
+        });
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarBackdrop').classList.remove('show');
+        }
+        document.getElementById('sidebarBackdrop').addEventListener('click', closeSidebar);
+
+        function updateDate() {
+            const now = new Date();
+            document.getElementById('dateDisplay').textContent =
+                now.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+        }
+
+        // =============================================================
+        // 初始化
+        // =============================================================
+        loadData();
+        updateDate();
+        renderDashboard();
+        renderClients();
+        renderProperties();
+        renderAnalytics();
+
+        window.openClientModal = openClientModal;
+        window.editProperty = editProperty;
+        window.deleteProperty = deleteProperty;
+        window.deleteClient = deleteClient;
+        window.navigateToClient = navigateToClient;
+        window.navigateTo = navigateTo;
+
+        console.log('🏢 招商经理工作台 v4.0 - 对话框式跟进 + 预约待跟进');
+        console.log('💡 支持模板快捷输入，预约时间自动同步到客户列表');
+    </script>
 </body>
 </html>
