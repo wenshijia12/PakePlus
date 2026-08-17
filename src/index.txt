@@ -1,0 +1,2747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KK德州酒馆 · 荣誉排行榜</title>
+    <style>
+        /* ===== 全局重置 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Roboto, sans-serif;
+            background: #080c1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(212, 167, 74, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(80, 120, 220, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(120, 80, 200, 0.03) 0%, transparent 60%);
+            transition: all 0.3s ease;
+        }
+
+        /* ===== 主容器 ===== */
+        .dashboard {
+            max-width: 1480px;
+            width: 100%;
+            background: linear-gradient(160deg, rgba(16, 22, 42, 0.95), rgba(8, 12, 26, 0.98));
+            border-radius: 48px 48px 36px 36px;
+            padding: 32px 40px 28px;
+            box-shadow:
+                0 40px 120px rgba(0, 0, 0, 0.85),
+                0 0 0 1px rgba(212, 167, 74, 0.08),
+                inset 0 0 120px rgba(212, 167, 74, 0.02);
+            border: 1px solid rgba(212, 167, 74, 0.06);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+        }
+
+        /* 动态光晕 */
+        .dashboard::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -20%;
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(ellipse, rgba(212, 167, 74, 0.05) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+            animation: glowFloat 8s ease-in-out infinite alternate;
+        }
+        .dashboard::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -20%;
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(ellipse, rgba(80, 120, 220, 0.04) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+            animation: glowFloat2 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes glowFloat {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+            100% { transform: translate(-30px, 20px) scale(1.1); opacity: 1; }
+        }
+        @keyframes glowFloat2 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+            100% { transform: translate(30px, -20px) scale(1.2); opacity: 0.8; }
+        }
+
+        .dashboard>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== 头部 ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(212, 167, 74, 0.06);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .header-icon {
+            font-size: 40px;
+            line-height: 1;
+            filter: drop-shadow(0 0 30px rgba(212, 167, 74, 0.15));
+        }
+
+        .header-title h1 {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #f7e8b0 0%, #d4a74a 40%, #e8c86a 70%, #f7e8b0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            text-shadow: 0 0 60px rgba(212, 167, 74, 0.08);
+        }
+
+        .header-title .sub {
+            font-size: 14px;
+            color: rgba(200, 180, 150, 0.30);
+            letter-spacing: 10px;
+            font-weight: 300;
+            margin-top: 2px;
+            -webkit-text-fill-color: rgba(200, 180, 150, 0.30);
+            background: none;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 5px 20px 5px 24px;
+            border-radius: 40px;
+            border: 1px solid rgba(212, 167, 74, 0.06);
+            backdrop-filter: blur(8px);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            color: rgba(200, 180, 160, 0.45);
+            font-size: 13px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-item .stat-icon {
+            font-size: 15px;
+        }
+
+        .stat-item span:last-child {
+            font-size: 20px;
+            font-weight: 700;
+            color: #d4a74a;
+            min-width: 28px;
+            text-align: center;
+            text-shadow: 0 0 30px rgba(212, 167, 74, 0.08);
+        }
+
+        .stat-item.highlight-gold span:last-child {
+            color: #f7d875;
+            text-shadow: 0 0 40px rgba(212, 167, 74, 0.15);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-ctrl {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 167, 74, 0.06);
+            color: rgba(200, 180, 160, 0.50);
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-ctrl:hover {
+            background: rgba(212, 167, 74, 0.06);
+            border-color: rgba(212, 167, 74, 0.15);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 30px rgba(212, 167, 74, 0.04);
+            color: rgba(200, 180, 160, 0.75);
+        }
+        .btn-ctrl.active {
+            background: rgba(212, 167, 74, 0.08);
+            border-color: rgba(212, 167, 74, 0.15);
+            color: #d4a74a;
+            box-shadow: 0 0 40px rgba(212, 167, 74, 0.04);
+        }
+
+        .btn-ctrl .dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(200, 180, 160, 0.20);
+            transition: all 0.3s ease;
+        }
+        .btn-ctrl.active .dot {
+            background: #d4a74a;
+            box-shadow: 0 0 20px rgba(212, 167, 74, 0.4);
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%,
+            100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.8); }
+        }
+
+        .btn-bigscreen {
+            background: linear-gradient(135deg, rgba(212, 167, 74, 0.04), rgba(180, 120, 200, 0.03));
+            border: 1px solid rgba(212, 167, 74, 0.06);
+            color: rgba(200, 180, 160, 0.60);
+            padding: 6px 22px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        .btn-bigscreen:hover {
+            background: rgba(212, 167, 74, 0.08);
+            border-color: rgba(212, 167, 74, 0.15);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 40px rgba(212, 167, 74, 0.05);
+            color: rgba(200, 180, 160, 0.85);
+        }
+
+        /* ===== 公告栏 ===== */
+        .announcement {
+            margin-bottom: 14px;
+            padding: 10px 20px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(212, 167, 74, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            transition: all 0.3s ease;
+            min-height: 50px;
+            backdrop-filter: blur(4px);
+        }
+        .announcement:hover {
+            border-color: rgba(212, 167, 74, 0.08);
+        }
+
+        .announcement-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            opacity: 0.5;
+            filter: drop-shadow(0 0 20px rgba(212, 167, 74, 0.08));
+        }
+
+        .announcement-content {
+            flex: 1;
+            min-width: 150px;
+            color: rgba(200, 180, 160, 0.70);
+            font-size: 16px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .announcement-content .placeholder {
+            color: rgba(200, 180, 160, 0.20);
+            font-weight: 300;
+        }
+
+        .announcement-content textarea {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: rgba(200, 180, 160, 0.80);
+            font-size: 16px;
+            font-weight: 300;
+            font-family: inherit;
+            outline: none;
+            resize: vertical;
+            min-height: 42px;
+            padding: 4px 0;
+            line-height: 1.6;
+        }
+
+        .announcement-content textarea::placeholder {
+            color: rgba(200, 180, 160, 0.20);
+            font-weight: 300;
+        }
+
+        .announcement-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .btn-announce {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 167, 74, 0.06);
+            color: rgba(200, 180, 160, 0.35);
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .btn-announce:hover {
+            background: rgba(212, 167, 74, 0.06);
+            border-color: rgba(212, 167, 74, 0.12);
+            color: rgba(200, 180, 160, 0.60);
+        }
+        .btn-announce.save {
+            background: linear-gradient(135deg, rgba(212, 167, 74, 0.15), rgba(180, 140, 60, 0.10));
+            color: #d4a74a;
+            border-color: rgba(212, 167, 74, 0.12);
+        }
+        .btn-announce.save:hover {
+            background: linear-gradient(135deg, rgba(212, 167, 74, 0.25), rgba(180, 140, 60, 0.15));
+            box-shadow: 0 4px 30px rgba(212, 167, 74, 0.06);
+            color: #f7d875;
+        }
+
+        /* ===== 搜索栏 ===== */
+        .search-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px 16px;
+            margin-bottom: 14px;
+            padding: 8px 18px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 40px;
+            border: 1px solid rgba(212, 167, 74, 0.04);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+        .search-bar:focus-within {
+            border-color: rgba(212, 167, 74, 0.12);
+            box-shadow: 0 0 40px rgba(212, 167, 74, 0.02);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 160px;
+            gap: 8px;
+            position: relative;
+        }
+
+        .search-icon {
+            font-size: 16px;
+            color: rgba(200, 180, 160, 0.15);
+            flex-shrink: 0;
+        }
+
+        .search-input-wrapper input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 5px 0;
+            font-size: 15px;
+            color: rgba(200, 180, 160, 0.75);
+            outline: none;
+            min-width: 100px;
+            font-weight: 300;
+        }
+
+        .search-input-wrapper input::placeholder {
+            color: rgba(200, 180, 160, 0.15);
+            font-weight: 300;
+        }
+
+        .btn-clear-search {
+            background: none;
+            border: none;
+            color: rgba(200, 180, 160, 0.15);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 4px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            display: none;
+        }
+        .btn-clear-search:hover {
+            color: rgba(200, 180, 160, 0.40);
+            transform: scale(1.1);
+        }
+        .btn-clear-search.visible {
+            display: block;
+        }
+
+        .search-result-count {
+            font-size: 12px;
+            color: rgba(200, 180, 160, 0.25);
+            font-weight: 300;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+
+        .search-result-count strong {
+            color: #d4a74a;
+            font-weight: 500;
+        }
+
+        .search-no-result {
+            display: none;
+            font-size: 12px;
+            color: rgba(200, 150, 130, 0.35);
+            font-weight: 300;
+            white-space: nowrap;
+        }
+        .search-no-result.visible {
+            display: inline;
+        }
+
+        /* ===== 工具条 ===== */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 12px;
+            margin-bottom: 14px;
+            padding: 5px 16px;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 30px;
+            border: 1px solid rgba(212, 167, 74, 0.03);
+        }
+
+        .toolbar-label {
+            font-size: 12px;
+            color: rgba(200, 180, 160, 0.15);
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-tool {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(212, 167, 74, 0.04);
+            color: rgba(200, 180, 160, 0.30);
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-tool:hover {
+            background: rgba(212, 167, 74, 0.04);
+            border-color: rgba(212, 167, 74, 0.08);
+            color: rgba(200, 180, 160, 0.55);
+            transform: translateY(-1px);
+        }
+        .btn-tool.import {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-tool.import input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* ===== 滚动容器 ===== */
+        .scroll-wrapper {
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(212, 167, 74, 0.04);
+            background: rgba(0, 0, 0, 0.20);
+            box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.4);
+            margin-bottom: 18px;
+            height: 420px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .scroll-wrapper::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        .scroll-wrapper::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        .scroll-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(212, 167, 74, 0.12);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .scroll-wrapper::-webkit-scrollbar-thumb:hover {
+            background: rgba(212, 167, 74, 0.25);
+        }
+
+        /* ===== 排行榜表格 ===== */
+        .rank-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+        }
+
+        .rank-table thead {
+            background: linear-gradient(135deg, rgba(212, 167, 74, 0.04), rgba(80, 120, 220, 0.02));
+            border-bottom: 1px solid rgba(212, 167, 74, 0.04);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(16px);
+        }
+
+        .rank-table thead th {
+            padding: 13px 16px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: rgba(200, 180, 160, 0.25);
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(212, 167, 74, 0.03);
+        }
+
+        .rank-table thead th:first-child {
+            padding-left: 24px;
+            width: 80px;
+        }
+        .rank-table thead th:nth-child(2) {
+            width: 80px;
+            text-align: center;
+        }
+        .rank-table thead th:nth-child(3) {
+            width: 110px;
+            text-align: center;
+        }
+        .rank-table thead th:nth-child(4) {
+            width: auto;
+            text-align: left;
+        }
+        .rank-table thead th:nth-child(5) {
+            width: 120px;
+            text-align: right;
+            padding-right: 24px;
+        }
+        .rank-table thead th:last-child {
+            width: 220px;
+            text-align: center;
+        }
+
+        .rank-table tbody tr {
+            border-bottom: 1px solid rgba(212, 167, 74, 0.02);
+            transition: background 0.4s ease, transform 0.2s ease;
+        }
+
+        .rank-table tbody tr:hover {
+            background: rgba(212, 167, 74, 0.03);
+            transform: scale(1.001);
+        }
+
+        .rank-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .rank-table tbody tr.hidden-row {
+            display: none !important;
+        }
+
+        .rank-table tbody td {
+            padding: 11px 16px;
+            vertical-align: middle;
+            color: rgba(200, 180, 160, 0.75);
+        }
+
+        .rank-table tbody td:first-child {
+            padding-left: 24px;
+            font-weight: 700;
+            font-size: 20px;
+            color: rgba(200, 180, 160, 0.30);
+            letter-spacing: 1px;
+        }
+
+        .rank-table tbody td:nth-child(2) {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .rank-table tbody td:nth-child(3) {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 400;
+            color: rgba(180, 200, 220, 0.45);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+            background: rgba(80, 120, 220, 0.02);
+            border-radius: 4px;
+        }
+
+        .rank-table tbody td:nth-child(4) {
+            font-size: 17px;
+            font-weight: 500;
+            color: rgba(220, 200, 180, 0.80);
+            letter-spacing: 0.5px;
+            padding-left: 12px;
+        }
+
+        .rank-table tbody td:nth-child(5) {
+            text-align: right;
+            padding-right: 24px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #d4a74a;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 1px;
+            text-shadow: 0 0 40px rgba(212, 167, 74, 0.04);
+        }
+
+        .rank-table tbody td:last-child {
+            text-align: center;
+            padding: 6px 8px;
+        }
+
+        /* ===== 排名特殊样式（更低调奢华） ===== */
+        .rank-1 td:first-child {
+            color: #f7d875 !important;
+            font-size: 28px !important;
+            text-shadow: 0 0 50px rgba(212, 167, 74, 0.15);
+        }
+        .rank-2 td:first-child {
+            color: #b8b8b8 !important;
+            font-size: 26px !important;
+            text-shadow: 0 0 30px rgba(200, 200, 200, 0.06);
+        }
+        .rank-3 td:first-child {
+            color: #cd8f5a !important;
+            font-size: 26px !important;
+            text-shadow: 0 0 30px rgba(205, 143, 90, 0.06);
+        }
+
+        .rank-1 {
+            background: rgba(212, 167, 74, 0.04) !important;
+            border-left: 3px solid rgba(212, 167, 74, 0.20);
+        }
+        .rank-2 {
+            background: rgba(200, 200, 200, 0.02) !important;
+            border-left: 3px solid rgba(200, 200, 200, 0.08);
+        }
+        .rank-3 {
+            background: rgba(205, 143, 90, 0.02) !important;
+            border-left: 3px solid rgba(205, 143, 90, 0.08);
+        }
+
+        .rank-1 td:nth-child(4) {
+            color: rgba(247, 216, 117, 0.85) !important;
+        }
+        .rank-2 td:nth-child(4) {
+            color: rgba(200, 200, 200, 0.70) !important;
+        }
+        .rank-3 td:nth-child(4) {
+            color: rgba(205, 143, 90, 0.70) !important;
+        }
+        .rank-1 td:nth-child(5) {
+            color: #f7d875 !important;
+            text-shadow: 0 0 50px rgba(212, 167, 74, 0.10);
+        }
+        .rank-2 td:nth-child(5) {
+            color: #b8b8b8 !important;
+        }
+        .rank-3 td:nth-child(5) {
+            color: #cd8f5a !important;
+        }
+
+        .rank-1 td:nth-child(3) {
+            color: rgba(247, 216, 117, 0.50) !important;
+            background: rgba(212, 167, 74, 0.04);
+        }
+        .rank-2 td:nth-child(3) {
+            color: rgba(200, 200, 200, 0.35) !important;
+            background: rgba(200, 200, 200, 0.02);
+        }
+        .rank-3 td:nth-child(3) {
+            color: rgba(205, 143, 90, 0.35) !important;
+            background: rgba(205, 143, 90, 0.02);
+        }
+
+        .medal {
+            font-size: 28px;
+            display: inline-block;
+            width: 42px;
+            text-align: center;
+            filter: drop-shadow(0 0 20px rgba(212, 167, 74, 0.04));
+        }
+
+        /* ===== 趋势指示 ===== */
+        .trend {
+            display: inline-block;
+            font-size: 18px;
+            min-width: 24px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .trend.up {
+            color: #5aaa5a;
+            text-shadow: 0 0 30px rgba(90, 170, 90, 0.10);
+        }
+        .trend.down {
+            color: #c07070;
+            text-shadow: 0 0 30px rgba(192, 112, 112, 0.08);
+        }
+        .trend.same {
+            color: rgba(200, 180, 160, 0.12);
+        }
+
+        /* ===== 快速积分按钮 ===== */
+        .quick-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-q {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(212, 167, 74, 0.04);
+            color: rgba(200, 180, 160, 0.25);
+            padding: 1px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1.6;
+            min-width: 28px;
+            text-align: center;
+        }
+        .btn-q:hover {
+            background: rgba(212, 167, 74, 0.06);
+            border-color: rgba(212, 167, 74, 0.10);
+            transform: scale(1.05);
+        }
+        .btn-q.plus {
+            color: rgba(90, 170, 90, 0.40);
+        }
+        .btn-q.plus:hover {
+            background: rgba(90, 170, 90, 0.06);
+            border-color: rgba(90, 170, 90, 0.10);
+            color: rgba(90, 170, 90, 0.70);
+        }
+        .btn-q.minus {
+            color: rgba(192, 112, 112, 0.35);
+        }
+        .btn-q.minus:hover {
+            background: rgba(192, 112, 112, 0.05);
+            border-color: rgba(192, 112, 112, 0.08);
+            color: rgba(192, 112, 112, 0.60);
+        }
+
+        /* ===== 操作按钮 ===== */
+        .action-group {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 12px;
+            border: none;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(200, 180, 160, 0.25);
+            border: 1px solid rgba(212, 167, 74, 0.04);
+            letter-spacing: 0.5px;
+            min-width: 44px;
+            backdrop-filter: blur(4px);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.20);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .btn-edit {
+            color: rgba(90, 138, 176, 0.35);
+            border-color: rgba(90, 138, 176, 0.06);
+        }
+        .btn-edit:hover {
+            background: rgba(90, 138, 176, 0.06);
+            border-color: rgba(90, 138, 176, 0.12);
+            color: rgba(90, 138, 176, 0.65);
+        }
+
+        .btn-delete {
+            color: rgba(192, 112, 112, 0.30);
+            border-color: rgba(192, 112, 112, 0.04);
+        }
+        .btn-delete:hover {
+            background: rgba(192, 112, 112, 0.05);
+            border-color: rgba(192, 112, 112, 0.08);
+            color: rgba(192, 112, 112, 0.55);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, rgba(212, 167, 74, 0.15), rgba(180, 140, 60, 0.10));
+            color: #d4a74a;
+            font-size: 14px;
+            padding: 7px 28px;
+            border: 1px solid rgba(212, 167, 74, 0.08);
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 40px rgba(212, 167, 74, 0.02);
+            min-width: auto;
+        }
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 50px rgba(212, 167, 74, 0.06);
+            background: linear-gradient(135deg, rgba(212, 167, 74, 0.25), rgba(180, 140, 60, 0.15));
+            color: #f7d875;
+        }
+        .btn-add:active {
+            transform: translateY(0px);
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(200, 180, 160, 0.25);
+            border-color: rgba(212, 167, 74, 0.04);
+        }
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(200, 180, 160, 0.45);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, rgba(90, 170, 90, 0.12), rgba(70, 140, 70, 0.08));
+            color: rgba(90, 170, 90, 0.60);
+            border: 1px solid rgba(90, 170, 90, 0.06);
+        }
+        .btn-save:hover {
+            background: linear-gradient(135deg, rgba(90, 170, 90, 0.20), rgba(70, 140, 70, 0.12));
+            color: rgba(90, 170, 90, 0.80);
+            box-shadow: 0 4px 40px rgba(90, 170, 90, 0.04);
+        }
+
+        /* ===== 底部：添加区域 ===== */
+        .footer-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.01);
+            padding: 10px 18px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(212, 167, 74, 0.03);
+        }
+
+        .add-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .add-form .field-group {
+            display: flex;
+            align-items: center;
+            gap: 4px 8px;
+            flex-wrap: wrap;
+            flex: 0 1 auto;
+        }
+
+        .add-form label {
+            font-size: 12px;
+            color: rgba(200, 180, 160, 0.25);
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .add-form label .label-icon {
+            margin-right: 2px;
+        }
+
+        .add-form input {
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: 1px solid rgba(212, 167, 74, 0.04);
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(200, 180, 160, 0.70);
+            font-size: 13px;
+            transition: all 0.3s ease;
+            outline: none;
+            width: 110px;
+            backdrop-filter: blur(4px);
+        }
+
+        .add-form input:focus {
+            border-color: rgba(212, 167, 74, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 0 40px rgba(212, 167, 74, 0.02);
+        }
+
+        .add-form input::placeholder {
+            color: rgba(200, 180, 160, 0.12);
+            font-weight: 300;
+        }
+
+        .add-form input.input-id {
+            width: 90px;
+            border-color: rgba(80, 120, 220, 0.04);
+            font-family: 'Courier New', monospace;
+        }
+        .add-form input.input-id:focus {
+            border-color: rgba(80, 120, 220, 0.10);
+        }
+
+        .add-form input.input-name {
+            width: 110px;
+        }
+        .add-form input.input-score {
+            width: 80px;
+        }
+
+        .add-form .input-hint {
+            font-size: 10px;
+            color: rgba(200, 180, 160, 0.08);
+            font-weight: 300;
+            letter-spacing: 0.3px;
+        }
+
+        .footer-hint {
+            color: rgba(200, 180, 160, 0.06);
+            font-size: 11px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* ===== 模态框 ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.70);
+            backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: linear-gradient(150deg, rgba(20, 28, 50, 0.95), rgba(10, 14, 30, 0.98));
+            border-radius: 32px;
+            padding: 28px 36px 24px;
+            max-width: 440px;
+            width: 92%;
+            border: 1px solid rgba(212, 167, 74, 0.06);
+            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.60);
+            transform: scale(0.92) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #f7e8b0, #d4a74a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-sub {
+            font-size: 13px;
+            color: rgba(200, 180, 160, 0.20);
+            margin-bottom: 20px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-field {
+            margin-bottom: 14px;
+        }
+
+        .modal-field label {
+            display: block;
+            font-size: 12px;
+            color: rgba(200, 180, 160, 0.25);
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+            font-weight: 300;
+        }
+
+        .modal-field label .field-icon {
+            margin-right: 4px;
+        }
+
+        .modal-field input {
+            width: 100%;
+            padding: 9px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(212, 167, 74, 0.04);
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(200, 180, 160, 0.75);
+            font-size: 16px;
+            font-weight: 400;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .modal-field input:focus {
+            border-color: rgba(212, 167, 74, 0.10);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 0 40px rgba(212, 167, 74, 0.02);
+        }
+
+        .modal-field input.field-id {
+            border-color: rgba(80, 120, 220, 0.04);
+            font-family: 'Courier New', monospace;
+        }
+        .modal-field input.field-id:focus {
+            border-color: rgba(80, 120, 220, 0.08);
+        }
+
+        .modal-field input.field-name {
+            border-color: rgba(212, 167, 74, 0.03);
+        }
+        .modal-field input.field-name:focus {
+            border-color: rgba(212, 167, 74, 0.08);
+        }
+
+        .modal-field input.field-score {
+            border-color: rgba(212, 167, 74, 0.03);
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .modal-field input.field-score:focus {
+            border-color: rgba(212, 167, 74, 0.08);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .modal-actions .btn {
+            padding: 8px 26px;
+            font-size: 14px;
+            min-width: 80px;
+        }
+
+        /* ===== 空状态 ===== */
+        .empty-state {
+            text-align: center;
+            padding: 36px 20px 32px;
+            color: rgba(200, 180, 160, 0.08);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 44px;
+            margin-bottom: 8px;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        /* ================================================================
+           大屏展示模式
+           ================================================================ */
+        .big-screen-mode .header-stats,
+        .big-screen-mode .footer-actions,
+        .big-screen-mode .toolbar,
+        .big-screen-mode .rank-table thead th:last-child,
+        .big-screen-mode .rank-table tbody td:last-child,
+        .big-screen-mode .announcement-actions {
+            display: none !important;
+        }
+
+        .big-screen-mode .announcement {
+            background: rgba(255, 255, 255, 0.01);
+            border-color: rgba(212, 167, 74, 0.02);
+            padding: 8px 16px;
+            min-height: 40px;
+        }
+        .big-screen-mode .announcement-content {
+            font-size: 20px;
+            text-align: center;
+            color: rgba(200, 180, 160, 0.50);
+        }
+        .big-screen-mode .announcement-icon {
+            font-size: 28px;
+        }
+
+        .big-screen-mode .search-bar {
+            background: rgba(255, 255, 255, 0.01);
+            border-color: rgba(212, 167, 74, 0.02);
+            padding: 6px 16px;
+            margin-bottom: 12px;
+        }
+        .big-screen-mode .search-bar:focus-within {
+            border-color: rgba(212, 167, 74, 0.06);
+        }
+        .big-screen-mode .search-input-wrapper input {
+            font-size: 17px;
+        }
+        .big-screen-mode .search-result-count {
+            font-size: 13px;
+        }
+
+        .big-screen-mode .scroll-wrapper {
+            height: 70vh;
+            min-height: 480px;
+        }
+
+        .big-screen-mode .scroll-wrapper::-webkit-scrollbar {
+            width: 0px;
+            height: 0px;
+        }
+        .big-screen-mode .scroll-wrapper {
+            scrollbar-width: none;
+        }
+
+        .big-screen-mode .rank-table {
+            font-size: 24px;
+        }
+        .big-screen-mode .rank-table thead th {
+            font-size: 18px;
+            padding: 18px 24px;
+        }
+        .big-screen-mode .rank-table thead th:first-child {
+            padding-left: 32px;
+            width: 100px;
+        }
+        .big-screen-mode .rank-table thead th:nth-child(2) {
+            padding: 18px 12px;
+            width: 90px;
+        }
+        .big-screen-mode .rank-table thead th:nth-child(3) {
+            padding: 18px 12px;
+            width: 130px;
+        }
+        .big-screen-mode .rank-table thead th:nth-child(4) {
+            padding-left: 12px;
+        }
+        .big-screen-mode .rank-table thead th:nth-child(5) {
+            padding-right: 32px;
+        }
+
+        .big-screen-mode .rank-table tbody td {
+            padding: 16px 24px;
+            font-size: 24px;
+        }
+        .big-screen-mode .rank-table tbody td:first-child {
+            padding-left: 32px;
+            font-size: 36px !important;
+        }
+        .big-screen-mode .rank-table tbody td:nth-child(2) {
+            font-size: 22px;
+            padding: 16px 12px;
+        }
+        .big-screen-mode .rank-table tbody td:nth-child(3) {
+            font-size: 20px;
+            padding: 16px 12px;
+        }
+        .big-screen-mode .rank-table tbody td:nth-child(4) {
+            font-size: 26px;
+            padding-left: 12px;
+        }
+        .big-screen-mode .rank-table tbody td:nth-child(5) {
+            font-size: 34px;
+            padding-right: 32px;
+        }
+        .big-screen-mode .medal {
+            font-size: 42px;
+            width: 56px;
+        }
+        .big-screen-mode .rank-1 td:first-child {
+            font-size: 46px !important;
+        }
+        .big-screen-mode .rank-2 td:first-child {
+            font-size: 42px !important;
+        }
+        .big-screen-mode .rank-3 td:first-child {
+            font-size: 42px !important;
+        }
+
+        .big-screen-mode .header-title h1 {
+            font-size: 44px;
+        }
+        .big-screen-mode .header-title .sub {
+            font-size: 16px;
+            letter-spacing: 10px;
+        }
+        .big-screen-mode .header-icon {
+            font-size: 44px;
+        }
+
+        .big-screen-mode .dashboard {
+            padding: 28px 40px 28px;
+        }
+
+        .big-screen-mode .btn-bigscreen {
+            background: rgba(255, 255, 255, 0.01);
+            border-color: rgba(212, 167, 74, 0.02);
+            color: rgba(200, 180, 160, 0.10);
+            font-size: 12px;
+            padding: 4px 12px;
+        }
+        .big-screen-mode .btn-bigscreen:hover {
+            background: rgba(212, 167, 74, 0.03);
+            color: rgba(200, 180, 160, 0.30);
+        }
+
+        .big-screen-mode .rank-table tbody td:nth-child(3) {
+            color: rgba(180, 200, 220, 0.35) !important;
+            background: rgba(80, 120, 220, 0.01);
+        }
+
+        .big-screen-mode .control-group .btn-ctrl {
+            display: none;
+        }
+
+        .big-screen-mode .trend {
+            font-size: 22px;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1024px) {
+            .dashboard {
+                padding: 24px 24px 18px;
+                border-radius: 36px;
+            }
+            .header-title h1 {
+                font-size: 28px;
+            }
+            .header-icon {
+                font-size: 32px;
+            }
+            .announcement-content {
+                font-size: 14px;
+            }
+            .search-bar {
+                padding: 6px 14px;
+            }
+            .big-screen-mode .rank-table {
+                font-size: 20px;
+            }
+            .big-screen-mode .rank-table thead th {
+                font-size: 16px;
+                padding: 14px 18px;
+            }
+            .big-screen-mode .rank-table tbody td {
+                font-size: 20px;
+                padding: 12px 18px;
+            }
+            .big-screen-mode .rank-table tbody td:first-child {
+                font-size: 30px !important;
+                padding-left: 20px;
+            }
+            .big-screen-mode .rank-table tbody td:nth-child(2) {
+                font-size: 18px;
+                padding: 12px 8px;
+            }
+            .big-screen-mode .rank-table tbody td:nth-child(3) {
+                font-size: 16px;
+                padding: 12px 8px;
+            }
+            .big-screen-mode .rank-table tbody td:nth-child(4) {
+                font-size: 22px;
+            }
+            .big-screen-mode .rank-table tbody td:nth-child(5) {
+                font-size: 28px;
+                padding-right: 20px;
+            }
+            .big-screen-mode .medal {
+                font-size: 34px;
+                width: 46px;
+            }
+            .big-screen-mode .header-title h1 {
+                font-size: 36px;
+            }
+            .big-screen-mode .scroll-wrapper {
+                height: 60vh;
+                min-height: 400px;
+            }
+            .big-screen-mode .announcement-content {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 16px 12px 12px;
+                border-radius: 28px;
+            }
+            .header-title h1 {
+                font-size: 20px;
+                letter-spacing: 2px;
+            }
+            .header-title .sub {
+                font-size: 10px;
+                letter-spacing: 4px;
+            }
+            .header-icon {
+                font-size: 26px;
+            }
+            .header-stats {
+                gap: 8px;
+                padding: 3px 10px;
+                flex-wrap: wrap;
+            }
+            .stat-item {
+                font-size: 10px;
+            }
+            .stat-item span:last-child {
+                font-size: 14px;
+            }
+            .announcement {
+                padding: 8px 12px;
+                min-height: 44px;
+                gap: 8px;
+            }
+            .announcement-icon {
+                font-size: 18px;
+            }
+            .announcement-content {
+                font-size: 13px;
+            }
+            .announcement-content textarea {
+                font-size: 13px;
+                min-height: 36px;
+            }
+            .search-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+                padding: 8px 12px;
+                border-radius: 24px;
+            }
+            .search-input-wrapper input {
+                font-size: 13px;
+            }
+            .search-result-count {
+                font-size: 11px;
+                text-align: right;
+            }
+            .toolbar {
+                padding: 4px 10px;
+                gap: 4px 8px;
+            }
+            .toolbar-label {
+                font-size: 10px;
+            }
+            .btn-tool {
+                font-size: 10px;
+                padding: 3px 10px;
+            }
+            .scroll-wrapper {
+                height: 340px;
+            }
+            .rank-table {
+                font-size: 13px;
+            }
+            .rank-table thead th,
+            .rank-table tbody td {
+                padding: 6px 8px;
+            }
+            .rank-table thead th:first-child,
+            .rank-table tbody td:first-child {
+                padding-left: 10px;
+                width: 60px;
+            }
+            .rank-table thead th:nth-child(2),
+            .rank-table tbody td:nth-child(2) {
+                width: 50px;
+                padding: 6px 4px;
+            }
+            .rank-table thead th:nth-child(3),
+            .rank-table tbody td:nth-child(3) {
+                width: 70px;
+                padding: 6px 4px;
+            }
+            .rank-table thead th:nth-child(5),
+            .rank-table tbody td:nth-child(5) {
+                padding-right: 10px;
+            }
+            .rank-table tbody td:first-child {
+                font-size: 16px;
+            }
+            .rank-table tbody td:nth-child(5) {
+                font-size: 18px;
+            }
+            .rank-table thead th:last-child,
+            .rank-table tbody td:last-child {
+                padding-right: 4px;
+                padding-left: 4px;
+            }
+            .rank-table tbody td:nth-child(2) {
+                font-size: 14px;
+                min-width: 36px;
+            }
+            .rank-table tbody td:nth-child(3) {
+                font-size: 11px;
+                min-width: 50px;
+            }
+            .rank-table tbody td:nth-child(4) {
+                font-size: 14px;
+                padding-left: 6px;
+            }
+            .medal {
+                font-size: 20px;
+                width: 30px;
+            }
+            .action-group {
+                gap: 3px;
+            }
+            .btn {
+                font-size: 9px;
+                padding: 2px 8px;
+                min-width: 34px;
+            }
+            .btn-q {
+                font-size: 9px;
+                padding: 0 6px;
+                min-width: 22px;
+            }
+            .quick-score {
+                gap: 2px;
+            }
+            .btn-add {
+                font-size: 13px;
+                padding: 5px 18px;
+            }
+            .add-form {
+                gap: 4px 8px;
+            }
+            .add-form input {
+                width: 80px;
+                font-size: 12px;
+                padding: 4px 8px;
+            }
+            .add-form input.input-id {
+                width: 70px;
+            }
+            .add-form input.input-score {
+                width: 60px;
+            }
+            .add-form .field-group {
+                flex: 1 1 auto;
+            }
+            .footer-hint {
+                display: none;
+            }
+            .header-right {
+                gap: 4px;
+            }
+            .btn-bigscreen {
+                font-size: 11px;
+                padding: 3px 10px;
+            }
+            .btn-ctrl {
+                font-size: 10px;
+                padding: 3px 8px;
+            }
+            .modal-box {
+                padding: 18px 16px;
+            }
+            .modal-title {
+                font-size: 20px;
+            }
+            .modal-actions .btn {
+                padding: 6px 16px;
+                font-size: 12px;
+                min-width: 60px;
+            }
+            .trend {
+                font-size: 14px;
+                min-width: 18px;
+            }
+
+            .big-screen-mode .rank-table {
+                font-size: 15px;
+            }
+            .big-screen-mode .rank-table thead th {
+                font-size: 12px;
+                padding: 8px 10px;
+            }
+            .big-screen-mode .rank-table tbody td {
+                font-size: 15px;
+                padding: 8px 10px;
+            }
+            .big-screen-mode .rank-table tbody td:first-child {
+                font-size: 22px !important;
+                padding-left: 10px;
+            }
+            .big-screen-mode .rank-table tbody td:nth-child(2) {
+                font-size: 14px;
+                padding: 8px 6px;
+            }
+            .big-screen-mode .rank-table tbody td:nth-child(3) {
+                font-size: 12px;
+                padding: 8px 6px;
+            }
+            .big-screen-mode .rank-table tbody td:nth-child(4) {
+                font-size: 17px;
+            }
+            .big-screen-mode .rank-table tbody td:nth-child(5) {
+                font-size: 22px;
+                padding-right: 10px;
+            }
+            .big-screen-mode .medal {
+                font-size: 26px;
+                width: 36px;
+            }
+            .big-screen-mode .header-title h1 {
+                font-size: 26px;
+            }
+            .big-screen-mode .scroll-wrapper {
+                height: 50vh;
+                min-height: 280px;
+            }
+            .big-screen-mode .dashboard {
+                padding: 12px 8px;
+            }
+            .big-screen-mode .announcement-content {
+                font-size: 15px;
+            }
+            .big-screen-mode .search-bar {
+                padding: 4px 10px;
+            }
+            .big-screen-mode .search-input-wrapper input {
+                font-size: 14px;
+            }
+            .big-screen-mode .trend {
+                font-size: 16px;
+            }
+            .big-screen-mode .rank-1 td:first-child {
+                font-size: 26px !important;
+            }
+            .big-screen-mode .rank-2 td:first-child {
+                font-size: 24px !important;
+            }
+            .big-screen-mode .rank-3 td:first-child {
+                font-size: 24px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard {
+                padding: 10px 6px 8px;
+                border-radius: 20px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+            }
+            .header-left {
+                justify-content: center;
+            }
+            .header-icon {
+                font-size: 22px;
+            }
+            .header-title h1 {
+                font-size: 17px;
+                text-align: center;
+                letter-spacing: 1px;
+            }
+            .header-title .sub {
+                font-size: 8px;
+                letter-spacing: 2px;
+                text-align: center;
+            }
+            .header-right {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 4px;
+            }
+            .header-stats {
+                justify-content: center;
+                padding: 2px 8px;
+                gap: 8px;
+            }
+            .stat-item {
+                font-size: 9px;
+            }
+            .stat-item span:last-child {
+                font-size: 13px;
+                min-width: 12px;
+            }
+            .control-group {
+                justify-content: center;
+            }
+            .announcement {
+                padding: 6px 8px;
+                min-height: 36px;
+                gap: 6px;
+                border-radius: 12px;
+            }
+            .announcement-icon {
+                font-size: 16px;
+            }
+            .announcement-content {
+                font-size: 12px;
+            }
+            .announcement-content textarea {
+                font-size: 12px;
+                min-height: 30px;
+            }
+            .btn-announce {
+                font-size: 10px;
+                padding: 2px 10px;
+            }
+            .search-bar {
+                padding: 6px 8px;
+                gap: 4px;
+                border-radius: 16px;
+            }
+            .search-input-wrapper input {
+                font-size: 12px;
+                min-width: 60px;
+            }
+            .search-result-count {
+                font-size: 10px;
+            }
+            .toolbar {
+                padding: 3px 8px;
+                gap: 3px 6px;
+                border-radius: 16px;
+            }
+            .toolbar-label {
+                font-size: 9px;
+            }
+            .btn-tool {
+                font-size: 9px;
+                padding: 2px 8px;
+            }
+            .scroll-wrapper {
+                height: 260px;
+            }
+            .rank-table {
+                font-size: 11px;
+            }
+            .rank-table thead th,
+            .rank-table tbody td {
+                padding: 4px 4px;
+            }
+            .rank-table thead th:first-child,
+            .rank-table tbody td:first-child {
+                padding-left: 6px;
+                width: 40px;
+            }
+            .rank-table thead th:nth-child(2),
+            .rank-table tbody td:nth-child(2) {
+                width: 30px;
+                padding: 4px 2px;
+            }
+            .rank-table thead th:nth-child(3),
+            .rank-table tbody td:nth-child(3) {
+                width: 50px;
+                padding: 4px 2px;
+            }
+            .rank-table tbody td:first-child {
+                font-size: 13px;
+            }
+            .rank-table tbody td:nth-child(2) {
+                font-size: 11px;
+            }
+            .rank-table tbody td:nth-child(3) {
+                font-size: 9px;
+            }
+            .rank-table tbody td:nth-child(4) {
+                font-size: 12px;
+                padding-left: 4px;
+            }
+            .rank-table tbody td:nth-child(5) {
+                font-size: 14px;
+                padding-right: 6px;
+            }
+            .rank-table thead th:last-child,
+            .rank-table tbody td:last-child {
+                padding: 3px 2px;
+            }
+            .medal {
+                font-size: 16px;
+                width: 24px;
+            }
+            .btn {
+                font-size: 8px;
+                padding: 1px 6px;
+                min-width: 26px;
+                border-radius: 10px;
+            }
+            .btn-q {
+                font-size: 8px;
+                padding: 0 4px;
+                min-width: 18px;
+            }
+            .quick-score {
+                gap: 1px;
+            }
+            .btn-add {
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+            .footer-actions {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 6px;
+                gap: 4px;
+            }
+            .add-form {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 3px;
+            }
+            .add-form .field-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 2px;
+            }
+            .add-form label {
+                font-size: 10px;
+            }
+            .add-form input {
+                width: 100%;
+                font-size: 11px;
+                padding: 3px 6px;
+            }
+            .add-form input.input-id {
+                width: 100%;
+            }
+            .add-form input.input-score {
+                width: 100%;
+            }
+            .btn-add {
+                padding: 4px;
+                font-size: 12px;
+            }
+            .modal-box {
+                padding: 14px 12px;
+                border-radius: 20px;
+            }
+            .modal-title {
+                font-size: 17px;
+            }
+            .modal-field input {
+                font-size: 14px;
+                padding: 6px 8px;
+            }
+            .modal-actions .btn {
+                padding: 4px 12px;
+                font-size: 11px;
+                min-width: 44px;
+            }
+            .btn-bigscreen {
+                font-size: 10px;
+                padding: 2px 8px;
+            }
+            .btn-ctrl {
+                font-size: 9px;
+                padding: 2px 6px;
+            }
+            .trend {
+                font-size: 11px;
+                min-width: 14px;
+            }
+            .rank-1 td:first-child {
+                font-size: 14px !important;
+            }
+            .rank-2 td:first-child {
+                font-size: 12px !important;
+            }
+            .rank-3 td:first-child {
+                font-size: 12px !important;
+            }
+
+            .big-screen-mode .rank-table {
+                font-size: 12px;
+            }
+            .big-screen-mode .rank-table thead th {
+                font-size: 9px;
+                padding: 5px 4px;
+            }
+            .big-screen-mode .rank-table tbody td {
+                font-size: 12px;
+                padding: 4px 4px;
+            }
+            .big-screen-mode .rank-table tbody td:first-child {
+                font-size: 16px !important;
+                padding-left: 4px;
+            }
+            .big-screen-mode .rank-table tbody td:nth-child(2) {
+                font-size: 11px;
+                padding: 4px 2px;
+            }
+            .big-screen-mode .rank-table tbody td:nth-child(3) {
+                font-size: 9px;
+                padding: 4px 2px;
+            }
+            .big-screen-mode .rank-table tbody td:nth-child(4) {
+                font-size: 14px;
+            }
+            .big-screen-mode .rank-table tbody td:nth-child(5) {
+                font-size: 16px;
+                padding-right: 4px;
+            }
+            .big-screen-mode .medal {
+                font-size: 18px;
+                width: 26px;
+            }
+            .big-screen-mode .header-title h1 {
+                font-size: 18px;
+            }
+            .big-screen-mode .scroll-wrapper {
+                height: 40vh;
+                min-height: 180px;
+            }
+            .big-screen-mode .dashboard {
+                padding: 6px 4px;
+            }
+            .big-screen-mode .announcement-content {
+                font-size: 13px;
+            }
+            .big-screen-mode .search-bar {
+                padding: 3px 6px;
+            }
+            .big-screen-mode .search-input-wrapper input {
+                font-size: 12px;
+            }
+            .big-screen-mode .trend {
+                font-size: 13px;
+            }
+            .big-screen-mode .rank-1 td:first-child {
+                font-size: 20px !important;
+            }
+            .big-screen-mode .rank-2 td:first-child {
+                font-size: 18px !important;
+            }
+            .big-screen-mode .rank-3 td:first-child {
+                font-size: 18px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+
+        <!-- ===== 头部 ===== -->
+        <header class="header">
+            <div class="header-left">
+                <span class="header-icon">♠</span>
+                <div class="header-title">
+                    <h1>KK德州酒馆 · 荣誉榜</h1>
+                    <div class="sub">✦ 荣耀殿堂 · 王者之争 ✦</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-icon">👥</span> 人数 <span id="totalPlayers">0</span>
+                    </div>
+                    <div class="stat-item highlight-gold">
+                        <span class="stat-icon">🏆</span> 最高 <span id="maxScore">0</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <button class="btn-ctrl active" id="btnScrollToggle">
+                        <span class="dot"></span> 滚屏
+                    </button>
+                    <button class="btn-bigscreen" id="toggleBigScreen">🖥 大屏</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== 公告栏 ===== -->
+        <div class="announcement" id="announcement">
+            <span class="announcement-icon">📢</span>
+            <div class="announcement-content" id="announcementContent">
+                <span class="placeholder">点击「编辑」发布公告，例如：欢迎参加今晚的德州扑克之夜！</span>
+            </div>
+            <div class="announcement-actions" id="announcementActions">
+                <button class="btn-announce" id="announceEditBtn">✎ 编辑</button>
+                <button class="btn-announce save" id="announceSaveBtn" style="display:none;">✓ 保存</button>
+                <button class="btn-announce" id="announceCancelBtn" style="display:none;">取消</button>
+            </div>
+        </div>
+
+        <!-- ===== 搜索栏 ===== -->
+        <div class="search-bar" id="searchBar">
+            <div class="search-input-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="搜索 ID 或 玩家姓名..." autocomplete="off" />
+                <button class="btn-clear-search" id="searchClear">✕</button>
+            </div>
+            <div class="search-result-count" id="searchCount">共 <strong id="matchCount">0</strong> 位玩家</div>
+            <span class="search-no-result" id="searchNoResult">✨ 未找到匹配玩家</span>
+        </div>
+
+        <!-- ===== 工具条 ===== -->
+        <div class="toolbar">
+            <span class="toolbar-label">📦 数据</span>
+            <button class="btn-tool" id="exportBtn">📤 导出</button>
+            <button class="btn-tool import" id="importBtn">
+                <span class="file-input-label">📥 导入</span>
+                <input type="file" id="importFileInput" accept=".json" />
+            </button>
+            <span style="flex:1;"></span>
+            <span class="toolbar-label" style="color:rgba(200,180,160,0.06);">💡 修改后自动保存</span>
+        </div>
+
+        <!-- ===== 排行榜滚动容器 ===== -->
+        <div class="scroll-wrapper" id="scrollWrapper">
+            <div class="scroll-viewport" id="scrollViewport">
+                <table class="rank-table" id="rankTable">
+                    <thead>
+                        <tr>
+                            <th>🏅 名次</th>
+                            <th>📊 趋势</th>
+                            <th>🆔 ID</th>
+                            <th>👤 玩家</th>
+                            <th>💰 积分</th>
+                            <th>⚙️ 操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- 动态渲染 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== 底部：添加区域 ===== -->
+        <div class="footer-actions">
+            <div class="add-form">
+                <div class="field-group">
+                    <label><span class="label-icon">🆔</span>ID</label>
+                    <input type="text" id="inputId" class="input-id" placeholder="留空自动" maxlength="20" />
+                    <span class="input-hint">· 唯一</span>
+                </div>
+                <div class="field-group">
+                    <label><span class="label-icon">👤</span>姓名</label>
+                    <input type="text" id="inputName" class="input-name" placeholder="玩家姓名" maxlength="20" />
+                </div>
+                <div class="field-group">
+                    <label><span class="label-icon">💰</span>积分</label>
+                    <input type="number" id="inputScore" class="input-score" placeholder="0" min="0" step="10" />
+                </div>
+                <button class="btn btn-add" id="btnAdd">✦ 录入</button>
+            </div>
+            <span class="footer-hint">♠ 数据自动保存 · 实时排序 ♥</span>
+        </div>
+    </div>
+
+    <!-- ===== 模态框（编辑） ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div class="modal-title">✎ 编辑玩家</div>
+            <div class="modal-sub">可修改 ID、姓名 和 积分</div>
+
+            <div class="modal-field">
+                <label><span class="field-icon">🆔</span> ID</label>
+                <input type="text" id="modalId" class="field-id" placeholder="输入唯一ID" maxlength="20" />
+            </div>
+            <div class="modal-field">
+                <label><span class="field-icon">👤</span> 姓名</label>
+                <input type="text" id="modalName" class="field-name" placeholder="玩家姓名" maxlength="20" />
+            </div>
+            <div class="modal-field">
+                <label><span class="field-icon">💰</span> 积分</label>
+                <input type="number" id="modalScore" class="field-score" placeholder="积分" min="0" step="10" />
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-cancel" id="modalCancel">取消</button>
+                <button class="btn btn-save" id="modalSave">✓ 保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  DATA
+        // ================================================================
+        const STORAGE_KEY = 'kk_tavern_rankings';
+        const ANNOUNCEMENT_KEY = 'kk_tavern_announcement';
+        let players = [];
+        let editingIndex = null;
+        let previousRankings = {};
+
+        // ================================================================
+        //  DOM refs
+        // ================================================================
+        const tbody = document.getElementById('tableBody');
+        const totalEl = document.getElementById('totalPlayers');
+        const maxEl = document.getElementById('maxScore');
+        const scrollWrapper = document.getElementById('scrollWrapper');
+
+        const inputId = document.getElementById('inputId');
+        const inputName = document.getElementById('inputName');
+        const inputScore = document.getElementById('inputScore');
+        const btnAdd = document.getElementById('btnAdd');
+
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalId = document.getElementById('modalId');
+        const modalName = document.getElementById('modalName');
+        const modalScore = document.getElementById('modalScore');
+        const modalCancel = document.getElementById('modalCancel');
+        const modalSave = document.getElementById('modalSave');
+
+        const bigScreenBtn = document.getElementById('toggleBigScreen');
+        const btnScrollToggle = document.getElementById('btnScrollToggle');
+
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const searchCount = document.getElementById('searchCount');
+        const matchCountEl = document.getElementById('matchCount');
+        const searchNoResult = document.getElementById('searchNoResult');
+
+        const announcementContent = document.getElementById('announcementContent');
+        const announceEditBtn = document.getElementById('announceEditBtn');
+        const announceSaveBtn = document.getElementById('announceSaveBtn');
+        const announceCancelBtn = document.getElementById('announceCancelBtn');
+
+        const exportBtn = document.getElementById('exportBtn');
+        const importFileInput = document.getElementById('importFileInput');
+
+        // ================================================================
+        //  公告栏
+        // ================================================================
+        let announcementText = '';
+        let isAnnounceEditing = false;
+
+        function loadAnnouncement() {
+            try {
+                const saved = localStorage.getItem(ANNOUNCEMENT_KEY);
+                if (saved) { announcementText = saved;
+                    renderAnnouncement(); }
+            } catch (_) {}
+        }
+
+        function saveAnnouncement(text) {
+            try { localStorage.setItem(ANNOUNCEMENT_KEY, text);
+                announcementText = text; } catch (_) {}
+        }
+
+        function renderAnnouncement() {
+            if (isAnnounceEditing) {
+                announcementContent.innerHTML =
+                `<textarea id="announceTextarea" placeholder="输入公告内容...">${escapeHtml(announcementText)}</textarea>`;
+                const ta = document.getElementById('announceTextarea');
+                ta.focus();
+                ta.setSelectionRange(ta.value.length, ta.value.length);
+                announceEditBtn.style.display = 'none';
+                announceSaveBtn.style.display = '';
+                announceCancelBtn.style.display = '';
+            } else {
+                if (announcementText.trim()) {
+                    announcementContent.innerHTML = `<span>${escapeHtml(announcementText)}</span>`;
+                } else {
+                    announcementContent.innerHTML =
+                        `<span class="placeholder">点击「编辑」发布公告，例如：欢迎参加今晚的德州扑克之夜！</span>`;
+                }
+                announceEditBtn.style.display = '';
+                announceSaveBtn.style.display = 'none';
+                announceCancelBtn.style.display = 'none';
+            }
+        }
+
+        announceEditBtn.addEventListener('click', () => { isAnnounceEditing = true;
+            renderAnnouncement(); });
+        announceCancelBtn.addEventListener('click', () => { isAnnounceEditing = false;
+            renderAnnouncement(); });
+        announceSaveBtn.addEventListener('click', () => {
+            const ta = document.getElementById('announceTextarea');
+            if (ta) { saveAnnouncement(ta.value.trim());
+                isAnnounceEditing = false;
+                renderAnnouncement(); }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && isAnnounceEditing) {
+                const ta = document.getElementById('announceTextarea');
+                if (ta && document.activeElement === ta) { e.preventDefault();
+                    announceSaveBtn.click(); }
+            }
+        });
+
+        // ================================================================
+        //  滚屏控制
+        // ================================================================
+        let scrollTimer = null;
+        let isScrolling = true;
+        let scrollPaused = false;
+        let isUserScrolling = false;
+        let userScrollTimeout = null;
+
+        function getRowHeight() {
+            const firstRow = document.querySelector('.rank-table tbody tr:not(.hidden-row)');
+            if (!firstRow) return 0;
+            return firstRow.offsetHeight;
+        }
+
+        function getHeaderHeight() {
+            const header = document.querySelector('.rank-table thead');
+            if (!header) return 0;
+            return header.offsetHeight;
+        }
+
+        function getVisibleRows() {
+            const viewportHeight = scrollWrapper.clientHeight;
+            const h = getHeaderHeight();
+            const rh = getRowHeight();
+            if (rh === 0) return 0;
+            return Math.floor((viewportHeight - h) / rh);
+        }
+
+        function getTotalRows() {
+            return document.querySelectorAll('.rank-table tbody tr:not(.hidden-row)').length;
+        }
+
+        function getMaxScrollTop() {
+            const totalRows = getTotalRows();
+            const visibleRows = getVisibleRows();
+            if (totalRows <= visibleRows) return 0;
+            const rh = getRowHeight();
+            const headerH = getHeaderHeight();
+            const contentHeight = headerH + totalRows * rh;
+            const viewportHeight = scrollWrapper.clientHeight;
+            return Math.max(0, contentHeight - viewportHeight);
+        }
+
+        function scrollToRow(index) {
+            const rh = getRowHeight();
+            const headerH = getHeaderHeight();
+            const totalRows = getTotalRows();
+            const visibleRows = getVisibleRows();
+            if (rh === 0 || totalRows === 0) return;
+            const maxIndex = Math.max(0, totalRows - visibleRows);
+            const safeIndex = Math.min(Math.max(0, index), maxIndex);
+            const scrollY = headerH + safeIndex * rh;
+            scrollWrapper.scrollTop = Math.min(scrollY, getMaxScrollTop());
+        }
+
+        function startScroll() {
+            stopScroll();
+            const totalRows = getTotalRows();
+            const visibleRows = getVisibleRows();
+            if (totalRows <= visibleRows || totalRows <= 1) { isScrolling = false;
+                updateScrollBtnState(); return; }
+            isScrolling = true;
+            updateScrollBtnState();
+            const maxScroll = getMaxScrollTop();
+            if (scrollWrapper.scrollTop >= maxScroll - 10) scrollWrapper.scrollTop = 0;
+            scrollTimer = setInterval(() => {
+                if (scrollPaused || isUserScrolling) return;
+                const totalNow = getTotalRows();
+                const visibleNow = getVisibleRows();
+                if (totalNow <= visibleNow || totalNow <= 1) { stopScroll(); return; }
+                const maxScroll = getMaxScrollTop();
+                const currentScroll = scrollWrapper.scrollTop;
+                const rh = getRowHeight();
+                const headerH = getHeaderHeight();
+                if (rh === 0) return;
+                const rawIndex = (currentScroll - headerH) / rh;
+                let nextIndex = Math.floor(rawIndex) + 1;
+                const maxIndex = Math.max(0, totalNow - visibleNow);
+                if (nextIndex > maxIndex) nextIndex = 0;
+                const targetScroll = headerH + nextIndex * rh;
+                scrollWrapper.scrollTo({ top: Math.min(targetScroll, maxScroll), behavior: 'smooth' });
+            }, 3500);
+        }
+
+        function stopScroll() {
+            if (scrollTimer) { clearInterval(scrollTimer);
+                scrollTimer = null; }
+            isScrolling = false;
+            updateScrollBtnState();
+        }
+
+        function toggleScroll() {
+            if (isScrolling) { stopScroll(); } else { startScroll(); }
+        }
+
+        function updateScrollBtnState() {
+            if (isScrolling) {
+                btnScrollToggle.classList.add('active');
+                btnScrollToggle.innerHTML = '<span class="dot"></span> 滚屏';
+            } else {
+                btnScrollToggle.classList.remove('active');
+                btnScrollToggle.innerHTML = '⏸ 暂停';
+            }
+        }
+
+        scrollWrapper.addEventListener('scroll', () => {
+            if (!isUserScrolling) { isUserScrolling = true; if (isScrolling && scrollTimer) { clearInterval(scrollTimer);
+                    scrollTimer = null; } }
+            clearTimeout(userScrollTimeout);
+            userScrollTimeout = setTimeout(() => { isUserScrolling = false; if (isScrolling) startScroll(); }, 3000);
+        });
+        scrollWrapper.addEventListener('mouseenter', () => { scrollPaused = true; });
+        scrollWrapper.addEventListener('mouseleave', () => { scrollPaused = false; });
+        btnScrollToggle.addEventListener('click', toggleScroll);
+
+        // ================================================================
+        //  搜索功能
+        // ================================================================
+        let searchKeyword = '';
+
+        function filterPlayers(keyword) {
+            searchKeyword = keyword.trim().toLowerCase();
+            const rows = document.querySelectorAll('.rank-table tbody tr');
+            let matchCount = 0;
+            rows.forEach(row => {
+                if (row.querySelector('.empty-state')) { row.classList.add('hidden-row'); return; }
+                const idCell = row.querySelector('td:nth-child(3)');
+                const nameCell = row.querySelector('td:nth-child(4)');
+                const idText = idCell ? idCell.textContent.trim() : '';
+                const nameText = nameCell ? nameCell.textContent.trim() : '';
+                let matched = true;
+                if (searchKeyword) {
+                    matched = idText.toLowerCase().includes(searchKeyword) ||
+                        nameText.toLowerCase().includes(searchKeyword);
+                }
+                if (matched) { row.classList.remove('hidden-row');
+                    matchCount++; } else { row.classList.add('hidden-row'); }
+            });
+            matchCountEl.textContent = matchCount;
+            if (searchKeyword && matchCount === 0) {
+                searchNoResult.classList.add('visible');
+                searchCount.style.display = 'none';
+            } else {
+                searchNoResult.classList.remove('visible');
+                searchCount.style.display = '';
+            }
+            if (searchKeyword) { searchClear.classList.add('visible'); } else { searchClear.classList.remove('visible'); }
+            if (searchKeyword) {
+                if (isScrolling && scrollTimer) { clearInterval(scrollTimer);
+                    scrollTimer = null; }
+                const firstMatch = document.querySelector('.rank-table tbody tr:not(.hidden-row)');
+                if (firstMatch) {
+                    const index = Array.from(document.querySelectorAll('.rank-table tbody tr:not(.hidden-row)')).indexOf(
+                        firstMatch);
+                    if (index >= 0) setTimeout(() => scrollToRow(index), 100);
+                }
+            } else {
+                if (isScrolling) startScroll();
+                scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        searchInput.addEventListener('input', (e) => filterPlayers(e.target.value));
+        searchClear.addEventListener('click', () => { searchInput.value = '';
+            filterPlayers('');
+            searchInput.focus(); });
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { searchInput.value = '';
+                filterPlayers('');
+                searchInput.blur(); }
+        });
+
+        // ================================================================
+        //  数据导出/导入
+        // ================================================================
+        function exportData() {
+            const data = { players: players, announcement: announcementText, exportedAt: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `KK排行榜_${new Date().toLocaleDateString().replace(/\//g, '-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.players && Array.isArray(data.players)) {
+                        if (confirm(`即将导入 ${data.players.length} 位玩家数据，当前数据将被覆盖。继续吗？`)) {
+                            players = data.players;
+                            if (data.announcement !== undefined) { saveAnnouncement(data.announcement);
+                                renderAnnouncement(); }
+                            saveData();
+                            render();
+                            alert('✅ 数据导入成功！');
+                        }
+                    } else { alert('❌ 无效的数据文件'); }
+                } catch (err) { alert('❌ 文件解析失败: ' + err.message); }
+            };
+            reader.readAsText(file);
+        }
+
+        exportBtn.addEventListener('click', exportData);
+        importFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) { importData(e.target.files[0]);
+                e.target.value = ''; }
+        });
+
+        // ================================================================
+        //  HELPERS
+        // ================================================================
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) { const parsed = JSON.parse(raw); if (Array.isArray(parsed) && parsed.length) { players = parsed; return; } }
+            } catch (_) {}
+            players = [
+                { id: 'P1001', name: '德州之虎', score: 2850 },
+                { id: 'P1002', name: '金手镯', score: 2420 },
+                { id: 'P1003', name: '河牌杀手', score: 2100 },
+                { id: 'P1004', name: '盲注猎人', score: 1860 },
+                { id: 'P1005', name: '同花顺', score: 1520 },
+                { id: 'P1006', name: '葫芦王', score: 1280 },
+                { id: 'P1007', name: '皇家同花顺', score: 980 },
+                { id: 'P1008', name: '四条猎人', score: 760 },
+            ];
+            saveData();
+        }
+
+        function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(players)); }
+
+        function generateId() {
+            const ts = Date.now().toString().slice(-6);
+            const rand = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+            return 'P' + ts + rand;
+        }
+
+        function isIdUnique(id, excludeIndex) {
+            return !players.some((p, idx) => p.id === id && idx !== excludeIndex);
+        }
+
+        function cleanId(id) { return id.trim(); }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function updateStatsDisplay() {
+            const total = players.length;
+            totalEl.textContent = total;
+            if (total === 0) { maxEl.textContent = '—'; } else { const scores = players.map(p => p.score);
+                maxEl.textContent = Math.max(...scores); }
+        }
+
+        // ================================================================
+        //  CORE: sort & render
+        // ================================================================
+        function sortPlayers() {
+            const currentRankMap = {};
+            players.forEach((p, idx) => { currentRankMap[p.id] = idx + 1; });
+            players.sort((a, b) => b.score - a.score);
+            players.forEach((p, idx) => {
+                const newRank = idx + 1;
+                const oldRank = previousRankings[p.id] || newRank;
+                if (oldRank < newRank) p._trend = 'down';
+                else if (oldRank > newRank) p._trend = 'up';
+                else p._trend = 'same';
+            });
+            players.forEach(p => { previousRankings[p.id] = players.indexOf(p) + 1; });
+        }
+
+        function render() {
+            sortPlayers();
+            const total = players.length;
+            updateStatsDisplay();
+
+            if (total === 0) {
+                tbody.innerHTML =
+                    `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🃏</div><p>酒馆空无一人 · 快来录入第一位勇士</p></div></td></tr>`;
+                stopScroll();
+                matchCountEl.textContent = '0';
+                searchNoResult.classList.remove('visible');
+                searchCount.style.display = '';
+                return;
+            }
+
+            let html = '';
+            const medals = ['🥇', '🥈', '🥉'];
+            for (let i = 0; i < players.length; i++) {
+                const p = players[i];
+                const rank = i + 1;
+                let rankDisplay = rank;
+                let rowClass = '';
+                if (rank === 1) { rankDisplay = medals[0];
+                    rowClass = 'rank-1'; } else if (rank === 2) { rankDisplay = medals[1];
+                    rowClass = 'rank-2'; } else if (rank === 3) { rankDisplay = medals[2];
+                    rowClass = 'rank-3'; }
+
+                let trendHtml = '';
+                if (p._trend === 'up') trendHtml = '<span class="trend up">▲</span>';
+                else if (p._trend === 'down') trendHtml = '<span class="trend down">▼</span>';
+                else trendHtml = '<span class="trend same">—</span>';
+
+                html += `
+                    <tr class="${rowClass}" data-index="${i}">
+                        <td><span class="medal">${rankDisplay}</span></td>
+                        <td>${trendHtml}</td>
+                        <td>${escapeHtml(p.id || '')}</td>
+                        <td>${escapeHtml(p.name)}</td>
+                        <td>${p.score}</td>
+                        <td>
+                            <div class="action-group">
+                                <div class="quick-score">
+                                    <button class="btn-q plus" data-index="${i}" data-delta="10">+10</button>
+                                    <button class="btn-q plus" data-index="${i}" data-delta="50">+50</button>
+                                    <button class="btn-q minus" data-index="${i}" data-delta="-10">-10</button>
+                                    <button class="btn-q minus" data-index="${i}" data-delta="-50">-50</button>
+                                </div>
+                                <button class="btn btn-edit" data-index="${i}" data-action="edit">✎</button>
+                                <button class="btn btn-delete" data-index="${i}" data-action="delete">✕</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+
+            if (searchKeyword) filterPlayers(searchKeyword);
+            else {
+                document.querySelectorAll('.rank-table tbody tr').forEach(row => row.classList.remove('hidden-row'));
+                matchCountEl.textContent = players.length;
+                searchNoResult.classList.remove('visible');
+                searchCount.style.display = '';
+                searchClear.classList.remove('visible');
+            }
+
+            document.querySelectorAll('.btn-q').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const index = parseInt(btn.dataset.index);
+                    const delta = parseInt(btn.dataset.delta);
+                    if (isNaN(index) || isNaN(delta)) return;
+                    if (index < 0 || index >= players.length) return;
+                    const newScore = Math.max(0, players[index].score + delta);
+                    players[index].score = newScore;
+                    saveData();
+                    render();
+                });
+            });
+
+            setTimeout(() => {
+                const totalNow = getTotalRows();
+                const visibleNow = getVisibleRows();
+                if (totalNow > visibleNow && totalNow > 1 && isScrolling && !searchKeyword) startScroll();
+                else if (totalNow <= visibleNow || totalNow <= 1) stopScroll();
+                else if (searchKeyword) { if (scrollTimer) { clearInterval(scrollTimer);
+                        scrollTimer = null; } }
+            }, 100);
+        }
+
+        // ================================================================
+        //  CRUD
+        // ================================================================
+        function addPlayer(id, name, score) {
+            const trimmedId = cleanId(id);
+            const trimmedName = name.trim();
+            if (!trimmedName) { alert('请输入玩家姓名'); return false; }
+            if (isNaN(score) || score < 0) { alert('请输入有效的积分（≥ 0）'); return false; }
+            let finalId = trimmedId;
+            if (!finalId) { finalId = generateId(); } else {
+                if (!isIdUnique(finalId, -1)) { alert(`ID "${finalId}" 已被其他玩家使用，请换一个。`); return false; }
+                if (!/^[a-zA-Z0-9_-]+$/.test(finalId)) { alert('ID只能包含字母、数字、下划线和短横线'); return false; }
+            }
+            const dup = players.find(p => p.name.toLowerCase() === trimmedName.toLowerCase());
+            if (dup) { if (!confirm(`已有玩家 "${dup.name}" (ID: ${dup.id})，是否继续添加？`)) return false; }
+            const newPlayer = { id: finalId, name: trimmedName, score: Math.round(score) };
+            players.push(newPlayer);
+            previousRankings[finalId] = players.length;
+            saveData();
+            render();
+            return true;
+        }
+
+        function deletePlayer(index) {
+            if (index < 0 || index >= players.length) return;
+            const name = players[index].name;
+            if (!confirm(`确定要删除玩家 "${name}" 吗？`)) return;
+            const id = players[index].id;
+            delete previousRankings[id];
+            players.splice(index, 1);
+            saveData();
+            render();
+        }
+
+        function editPlayer(index, newId, newName, newScore) {
+            if (index < 0 || index >= players.length) return false;
+            const trimmedId = cleanId(newId);
+            const trimmedName = newName.trim();
+            if (!trimmedName) { alert('请输入玩家姓名'); return false; }
+            if (isNaN(newScore) || newScore < 0) { alert('请输入有效的积分（≥ 0）'); return false; }
+            if (!trimmedId) { alert('ID不能为空'); return false; }
+            if (!/^[a-zA-Z0-9_-]+$/.test(trimmedId)) { alert('ID只能包含字母、数字、下划线和短横线'); return false; }
+            const oldId = players[index].id;
+            if (trimmedId !== oldId && !isIdUnique(trimmedId, index)) {
+                alert(`ID "${trimmedId}" 已被其他玩家使用，请换一个。`);
+                return false;
+            }
+            if (trimmedId !== oldId) {
+                const rank = previousRankings[oldId];
+                delete previousRankings[oldId];
+                previousRankings[trimmedId] = rank || index + 1;
+            }
+            players[index].id = trimmedId;
+            players[index].name = trimmedName;
+            players[index].score = Math.round(newScore);
+            saveData();
+            render();
+            return true;
+        }
+
+        // ================================================================
+        //  MODAL
+        // ================================================================
+        function openModal(index) {
+            if (index < 0 || index >= players.length) return;
+            editingIndex = index;
+            modalId.value = players[index].id || '';
+            modalName.value = players[index].name;
+            modalScore.value = players[index].score;
+            modalOverlay.classList.add('active');
+            scrollPaused = true;
+            setTimeout(() => modalId.focus(), 150);
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            editingIndex = null;
+            scrollPaused = false;
+        }
+
+        function handleModalSave() {
+            if (editingIndex === null || editingIndex < 0 || editingIndex >= players.length) return;
+            const idVal = modalId.value.trim();
+            const nameVal = modalName.value.trim();
+            const scoreVal = parseFloat(modalScore.value);
+            if (!idVal) { alert('ID不能为空');
+                modalId.focus(); return; }
+            if (!nameVal) { alert('请输入玩家姓名');
+                modalName.focus(); return; }
+            if (isNaN(scoreVal) || scoreVal < 0) { alert('请输入有效的积分（≥ 0）');
+                modalScore.focus(); return; }
+            const success = editPlayer(editingIndex, idVal, nameVal, scoreVal);
+            if (success) closeModal();
+        }
+
+        // ================================================================
+        //  BIG SCREEN MODE
+        // ================================================================
+        function toggleBigScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.warn('全屏请求被拒绝', err));
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                document.body.classList.add('big-screen-mode');
+                bigScreenBtn.textContent = '⏹ 退出';
+                if (!isScrolling && !searchKeyword) startScroll();
+                setTimeout(() => {
+                    if (searchKeyword) {
+                        const firstMatch = document.querySelector('.rank-table tbody tr:not(.hidden-row)');
+                        if (firstMatch) {
+                            const index = Array.from(document.querySelectorAll('.rank-table tbody tr:not(.hidden-row)'))
+                                .indexOf(firstMatch);
+                            if (index >= 0) scrollToRow(index);
+                        }
+                    }
+                }, 300);
+            } else {
+                document.body.classList.remove('big-screen-mode');
+                bigScreenBtn.textContent = '🖥 大屏';
+                if (isScrolling && !searchKeyword) startScroll();
+            }
+        });
+
+        bigScreenBtn.addEventListener('click', toggleBigScreen);
+
+        // ================================================================
+        //  EVENTS
+        // ================================================================
+        tbody.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            const action = btn.dataset.action;
+            const index = parseInt(btn.dataset.index);
+            if (isNaN(index)) return;
+            if (action === 'edit') openModal(index);
+            else if (action === 'delete') deletePlayer(index);
+        });
+
+        btnAdd.addEventListener('click', () => {
+            const idVal = inputId.value.trim();
+            const nameVal = inputName.value.trim();
+            const scoreVal = parseFloat(inputScore.value);
+            const ok = addPlayer(idVal, nameVal, scoreVal);
+            if (ok) { inputId.value = '';
+                inputName.value = '';
+                inputScore.value = '';
+                inputId.focus(); }
+        });
+
+        inputId.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault();
+                inputName.focus(); } });
+        inputName.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault();
+                inputScore.focus(); } });
+        inputScore.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault();
+                btnAdd.click(); } });
+
+        modalCancel.addEventListener('click', closeModal);
+        modalSave.addEventListener('click', handleModalSave);
+        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+
+        modalId.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault();
+                modalName.focus(); } });
+        modalName.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault();
+                modalScore.focus(); } });
+        modalScore.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault();
+                handleModalSave(); }
+            if (e.key === 'Escape') { closeModal(); }
+        });
+
+        let resizeTimer = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (players.length > 0) {
+                    if (searchKeyword) {
+                        const firstMatch = document.querySelector('.rank-table tbody tr:not(.hidden-row)');
+                        if (firstMatch) {
+                            const index = Array.from(document.querySelectorAll('.rank-table tbody tr:not(.hidden-row)'))
+                                .indexOf(firstMatch);
+                            if (index >= 0) scrollToRow(index);
+                        }
+                    } else {
+                        const total = getTotalRows();
+                        const visible = getVisibleRows();
+                        if (total > visible && total > 1 && isScrolling) startScroll();
+                        else if (total <= visible || total <= 1) stopScroll();
+                    }
+                }
+            }, 300);
+        });
+
+        // ================================================================
+        //  INIT
+        // ================================================================
+        loadData();
+        loadAnnouncement();
+        render();
+
+        setTimeout(() => {
+            const total = getTotalRows();
+            const visible = getVisibleRows();
+            if (total > visible && total > 1 && !searchKeyword) { startScroll(); } else { isScrolling = false;
+                updateScrollBtnState(); }
+        }, 400);
+
+        inputId.focus();
+
+        console.log('♠ KK德州酒馆荣誉排行榜已加载！');
+        console.log(`📊 当前 ${players.length} 位玩家`);
+        console.log('🔍 支持按 ID / 姓名搜索');
+        console.log('📢 支持公告栏编辑');
+        console.log('📤📥 支持数据导出/导入');
+        console.log('🔄 自动滚屏已启用');
+    </script>
+</body>
+</html>
