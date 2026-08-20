@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>梅梅工作台 · 新塘环宇广场</title>
+    <title>招商工作台 · 新塘环宇广场</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
     <style>
-        /* ===== 全局 ===== */
+        /* ===== 所有样式与之前完全一致，仅修改了锁屏标题等 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -64,7 +64,6 @@
             border-radius: 10px;
         }
 
-        /* ===== 侧边栏 ===== */
         .sidebar {
             position: fixed;
             top: 0;
@@ -159,7 +158,6 @@
             text-align: center;
         }
 
-        /* ===== 主区域 ===== */
         .main {
             margin-left: var(--sidebar-width);
             flex: 1;
@@ -168,7 +166,6 @@
             min-height: 100vh;
         }
 
-        /* ===== 顶栏 ===== */
         .header {
             height: var(--header-height);
             background: rgba(255, 255, 255, 0.92);
@@ -236,7 +233,6 @@
         .header-right .avatar:hover {
             opacity: 0.8;
         }
-        /* 下拉菜单 */
         .avatar-dropdown {
             display: none;
             position: absolute;
@@ -268,7 +264,6 @@
             width: 16px;
         }
 
-        /* ===== 内容区 ===== */
         .content {
             padding: 24px 28px 40px;
             flex: 1;
@@ -291,7 +286,6 @@
             }
         }
 
-        /* ===== 卡片 & 统计 ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -382,7 +376,6 @@
             padding: 16px 20px;
         }
 
-        /* ===== 任务列表 / 活动 ===== */
         .task-list {
             list-style: none;
         }
@@ -430,7 +423,6 @@
             white-space: nowrap;
         }
 
-        /* ===== 表格 ===== */
         .table-wrapper {
             overflow-x: auto;
         }
@@ -527,6 +519,14 @@
             background: var(--orange-bg);
             color: var(--orange);
             border: 1px solid var(--orange);
+        }
+        .status-tag.合作中 {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+        .status-tag.已暂停 {
+            background: var(--red-bg);
+            color: var(--red);
         }
 
         .btn {
@@ -635,7 +635,6 @@
             cursor: pointer;
         }
 
-        /* ===== 模态框 ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -768,7 +767,6 @@
             flex-shrink: 0;
         }
 
-        /* ===== 租控简易 ===== */
         .rental-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -815,7 +813,6 @@
             background: var(--orange-bg);
         }
 
-        /* ===== 跟进记录 - 对话框模式 ===== */
         .followup-item {
             background: var(--gray-50);
             border-radius: 6px;
@@ -849,7 +846,6 @@
             border-radius: 4px;
         }
 
-        /* 聊天输入框 */
         .chat-input-area {
             background: var(--gray-50);
             border-radius: 8px;
@@ -945,7 +941,6 @@
             background: var(--gray-100);
         }
 
-        /* ===== 密码锁屏 ===== */
         .lock-screen {
             position: fixed;
             inset: 0;
@@ -1033,7 +1028,6 @@
             margin-top: 12px;
         }
 
-        /* ===== 响应式 ===== */
         @media (max-width: 992px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -1139,7 +1133,7 @@
     <div class="lock-screen" id="lockScreen">
         <div class="lock-box">
             <i class="fas fa-lock"></i>
-            <h2>梅梅工作台</h2>
+            <h2>招商工作台</h2>
             <p>请输入密码以继续</p>
             <input type="password" id="lockPassword" placeholder="输入密码" autofocus />
             <div class="lock-error" id="lockError"></div>
@@ -1157,13 +1151,14 @@
             <i class="fas fa-building"></i>
             <div>
                 <h1>环宇广场</h1>
-                <small>梅梅 · 个人工作台</small>
+                <small>招商工作台</small>
             </div>
         </div>
         <nav class="sidebar-nav">
             <div class="nav-label">导航</div>
             <a class="active" data-page="dashboard"><i class="fas fa-chart-pie"></i> 工作台</a>
             <a data-page="clients"><i class="fas fa-users"></i> 客户管理 <span class="badge" id="clientCountBadge">0</span></a>
+            <a data-page="agents"><i class="fas fa-handshake"></i> 中介管理 <span class="badge" id="agentCountBadge">0</span></a>
             <a data-page="properties"><i class="fas fa-store"></i> 房源管理 <span class="badge" id="propertyCountBadge">0</span></a>
             <div class="nav-label" style="margin-top:12px;">分析</div>
             <a data-page="analytics"><i class="fas fa-chart-line"></i> 数据看板</a>
@@ -1183,7 +1178,7 @@
             <div class="header-right">
                 <span class="date-display" id="dateDisplay"></span>
                 <div class="avatar" id="avatarBtn">
-                    梅
+                    招
                     <div class="avatar-dropdown" id="avatarDropdown">
                         <div id="changePwdBtn"><i class="fas fa-key"></i> 修改密码</div>
                         <div id="lockAppBtn"><i class="fas fa-lock"></i> 锁定屏幕</div>
@@ -1289,12 +1284,68 @@
                                         <th>需求业态</th>
                                         <th>面积</th>
                                         <th>阶段</th>
+                                        <th>来源</th>
                                         <th>下次跟进</th>
                                         <th style="text-align:right;">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody id="clientTableBody">
-                                    <tr><td colspan="9" class="text-muted" style="text-align:center;padding:30px 0;">暂无客户</td></tr>
+                                    <tr><td colspan="10" class="text-muted" style="text-align:center;padding:30px 0;">暂无客户</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 中介管理 ===== -->
+            <div class="page" id="page-agents">
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="agentSearch" placeholder="搜索中介名称、联系人..." />
+                    </div>
+                    <div class="filter-group">
+                        <select id="agentStatusFilter">
+                            <option value="">全部状态</option>
+                            <option value="合作中">合作中</option>
+                            <option value="已暂停">已暂停</option>
+                        </select>
+                        <button class="btn btn-primary" id="addAgentBtn"><i class="fas fa-plus"></i> 添加中介</button>
+                    </div>
+                </div>
+                <!-- 统计卡片 -->
+                <div class="stats-grid" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:16px;">
+                    <div class="stat-card">
+                        <div class="label">总中介</div>
+                        <div class="value" id="statTotalAgents">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">合作中</div>
+                        <div class="value" id="statActiveAgents">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">已暂停</div>
+                        <div class="value" id="statInactiveAgents">0</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body" style="padding:0;">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>中介名称</th>
+                                        <th>联系人</th>
+                                        <th>电话</th>
+                                        <th>状态</th>
+                                        <th>关联客户数</th>
+                                        <th>备注</th>
+                                        <th style="text-align:right;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="agentTableBody">
+                                    <tr><td colspan="7" class="text-muted" style="text-align:center;padding:30px 0;">暂无中介</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1469,6 +1520,15 @@
                         </select>
                     </div>
                 </div>
+                <!-- 关联中介（仅当来源为中介推荐时显示） -->
+                <div class="form-row" id="agentSelectRow" style="display:none;">
+                    <div class="form-group">
+                        <label>关联中介 <span class="required">*</span></label>
+                        <select id="fAgentId">
+                            <option value="">请选择中介</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label>备注</label>
                     <input type="text" id="fNotes" placeholder="客户特点等" />
@@ -1522,6 +1582,50 @@
             <div class="modal-footer">
                 <button class="btn btn-outline" data-close="clientModal">关闭</button>
                 <button class="btn btn-primary" id="saveClientBtn">保存客户信息</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- 模态框：中介 -->
+    <!-- ========================================================= -->
+    <div class="modal-overlay" id="agentModal">
+        <div class="modal" style="max-width:500px;">
+            <div class="modal-header">
+                <h3 id="agentModalTitle">添加中介</h3>
+                <button class="close-btn" data-close="agentModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="agentEditId" />
+                <div class="form-group">
+                    <label>中介名称 <span class="required">*</span></label>
+                    <input type="text" id="fAgentName" placeholder="如：某某地产" />
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>联系人</label>
+                        <input type="text" id="fAgentContact" placeholder="姓名" />
+                    </div>
+                    <div class="form-group">
+                        <label>电话</label>
+                        <input type="text" id="fAgentPhone" placeholder="手机号" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>合作状态</label>
+                    <select id="fAgentStatus">
+                        <option value="合作中">合作中</option>
+                        <option value="已暂停">已暂停</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="fAgentNotes" rows="2" placeholder="备注信息..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" data-close="agentModal">取消</button>
+                <button class="btn btn-primary" id="saveAgentBtn">保存</button>
             </div>
         </div>
     </div>
@@ -1643,7 +1747,6 @@
 
         function initPassword() {
             if (!getStoredPassword()) {
-                // 默认密码 123456
                 setStoredPassword('123456');
                 console.log('🔑 默认密码已设置: 123456');
             }
@@ -1663,17 +1766,16 @@
             document.getElementById('lockScreen').classList.add('hidden');
             document.getElementById('sidebar').style.display = 'flex';
             document.getElementById('mainApp').style.display = 'flex';
-            // 初始化数据
             if (!window._initialized) {
                 loadData();
                 updateDate();
                 renderDashboard();
                 renderClients();
+                renderAgents();
                 renderProperties();
                 renderAnalytics();
                 window._initialized = true;
             }
-            // 聚焦输入框
             setTimeout(() => {
                 const firstInput = document.querySelector('.content input');
                 if (firstInput) firstInput.focus();
@@ -1686,10 +1788,8 @@
             document.getElementById('lockPassword').value = '';
             document.getElementById('lockError').textContent = '';
             document.getElementById('lockPassword').focus();
-            // 隐藏主界面（但保留显示，锁屏覆盖）
         }
 
-        // 解锁事件
         document.getElementById('lockUnlockBtn').addEventListener('click', function() {
             const pwd = document.getElementById('lockPassword').value;
             if (verifyPassword(pwd)) {
@@ -1707,7 +1807,6 @@
             }
         });
 
-        // 锁定屏幕（从下拉菜单）
         document.getElementById('lockAppBtn').addEventListener('click', function() {
             lockApp();
             document.getElementById('avatarDropdown').classList.remove('show');
@@ -1753,7 +1852,6 @@
             alert('✅ 密码修改成功！');
         });
 
-        // 关闭修改密码模态框时清空错误
         document.querySelector('[data-close="changePwdModal"]').addEventListener('click', function() {
             document.getElementById('changePwdError').textContent = '';
         });
@@ -1770,9 +1868,9 @@
         });
 
         // =============================================================
-        // 数据层（与之前相同）
+        // 数据层 - 增加中介
         // =============================================================
-        const STORAGE_KEY = 'huanyu_crm_v4';
+        const STORAGE_KEY = 'huanyu_crm_v5';
 
         const defaultData = {
             clients: [{
@@ -1785,6 +1883,7 @@
                 demandArea: 180,
                 stage: '签约',
                 source: '中介推荐',
+                agentId: 'a1',
                 notes: '已签约，装修中',
                 nextFollowup: '2026-08-20',
                 createTime: '2026-07-10'
@@ -1798,6 +1897,7 @@
                 demandArea: 120,
                 stage: '谈判',
                 source: '自然来访',
+                agentId: '',
                 notes: '对租金有异议',
                 nextFollowup: '2026-08-18',
                 createTime: '2026-07-15'
@@ -1811,6 +1911,7 @@
                 demandArea: 350,
                 stage: '看场',
                 source: '中介推荐',
+                agentId: 'a2',
                 notes: '已看场两次',
                 nextFollowup: '2026-08-16',
                 createTime: '2026-07-20'
@@ -1824,6 +1925,7 @@
                 demandArea: 200,
                 stage: '意向',
                 source: '线上推广',
+                agentId: '',
                 notes: '咨询价格',
                 nextFollowup: '2026-08-22',
                 createTime: '2026-07-25'
@@ -1837,9 +1939,35 @@
                 demandArea: 500,
                 stage: '流失',
                 source: '中介推荐',
+                agentId: 'a1',
                 notes: '已另选其他商场',
                 nextFollowup: null,
                 createTime: '2026-06-28'
+            }],
+            agents: [{
+                id: 'a1',
+                name: '信达地产',
+                contact: '赵经理',
+                phone: '13800008888',
+                status: '合作中',
+                notes: '主要推荐餐饮类客户',
+                createTime: '2026-07-01'
+            }, {
+                id: 'a2',
+                name: '恒通置业',
+                contact: '钱先生',
+                phone: '13900009999',
+                status: '合作中',
+                notes: '擅长娱乐、办公业态',
+                createTime: '2026-07-05'
+            }, {
+                id: 'a3',
+                name: '中联房产',
+                contact: '孙女士',
+                phone: '13700007777',
+                status: '已暂停',
+                notes: '近期无推荐',
+                createTime: '2026-07-10'
             }],
             properties: [{
                 id: 'p1',
@@ -1981,6 +2109,7 @@
                 try {
                     const parsed = JSON.parse(raw);
                     if (parsed.clients) window._clients = parsed.clients;
+                    if (parsed.agents) window._agents = parsed.agents;
                     if (parsed.properties) window._properties = parsed.properties;
                     if (parsed.followups) { window._followups = parsed.followups;
                         followupIdCounter = Math.max(...window._followups.map(f => parseInt(f.id.replace('f', ''))), 0) + 1; }
@@ -1988,6 +2117,7 @@
                 } catch (e) {}
             }
             window._clients = defaultData.clients;
+            window._agents = defaultData.agents;
             window._properties = defaultData.properties;
             window._followups = defaultData.followups;
             followupIdCounter = Math.max(...window._followups.map(f => parseInt(f.id.replace('f', ''))), 0) + 1;
@@ -1997,6 +2127,7 @@
         function saveData() {
             const data = {
                 clients: window._clients,
+                agents: window._agents,
                 properties: window._properties,
                 followups: window._followups,
             };
@@ -2005,6 +2136,8 @@
         }
 
         function getClients() { return window._clients || []; }
+
+        function getAgents() { return window._agents || []; }
 
         function getProperties() { return window._properties || []; }
 
@@ -2017,6 +2150,8 @@
         function getProperty(id) { return getProperties().find(p => p.id === id); }
 
         function getClient(id) { return getClients().find(c => c.id === id); }
+
+        function getAgent(id) { return getAgents().find(a => a.id === id); }
 
         function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
@@ -2034,10 +2169,11 @@
         }
 
         // =============================================================
-        // UI 函数（与之前相同，略作精简）
+        // UI 渲染
         // =============================================================
         function updateBadges() {
             document.getElementById('clientCountBadge').textContent = getClients().length;
+            document.getElementById('agentCountBadge').textContent = getAgents().length;
             document.getElementById('propertyCountBadge').textContent = getProperties().length;
         }
 
@@ -2111,6 +2247,7 @@
             setTimeout(() => { openClientModal(clientId); }, 100);
         }
 
+        // ===== 客户列表 =====
         function renderClients() {
             const tbody = document.getElementById('clientTableBody');
             let list = getClients();
@@ -2124,7 +2261,7 @@
             const today = new Date().toISOString().slice(0, 10);
             if (list.length === 0) {
                 tbody.innerHTML =
-                `<tr><td colspan="9" class="text-muted" style="text-align:center;padding:30px 0;">暂无客户</td></tr>`;
+                `<tr><td colspan="10" class="text-muted" style="text-align:center;padding:30px 0;">暂无客户</td></tr>`;
                 return;
             }
             tbody.innerHTML = list.map(c => {
@@ -2136,6 +2273,8 @@
                             'status-tag today';
                         nextDisplay = c.nextFollowup + ' 🔔'; }
                 }
+                const agent = c.agentId ? getAgent(c.agentId) : null;
+                const sourceDisplay = c.source === '中介推荐' ? (agent ? agent.name : '中介推荐') : c.source;
                 return `<tr>
                             <td><strong>${c.company}</strong></td>
                             <td>${c.contact}</td>
@@ -2144,6 +2283,7 @@
                             <td><span class="status-tag" style="background:var(--blue-bg);color:var(--blue);">${c.demandType || '-'}</span></td>
                             <td>${c.demandArea ? c.demandArea+'㎡' : '-'}</td>
                             <td><span class="status-tag ${c.stage}">${c.stage || '意向'}</span></td>
+                            <td>${sourceDisplay}</td>
                             <td>${nextClass ? `<span class="${nextClass}">${nextDisplay}</span>` : nextDisplay}</td>
                             <td style="text-align:right;white-space:nowrap;">
                                 <button class="btn btn-ghost btn-sm" onclick="openClientModal('${c.id}')" title="编辑/跟进"><i class="fas fa-edit"></i></button>
@@ -2153,6 +2293,44 @@
             }).join('');
         }
 
+        // ===== 中介列表 =====
+        function renderAgents() {
+            const tbody = document.getElementById('agentTableBody');
+            let list = getAgents();
+            const search = document.getElementById('agentSearch').value.trim().toLowerCase();
+            const status = document.getElementById('agentStatusFilter').value;
+            if (search) list = list.filter(a => a.name.toLowerCase().includes(search) || (a.contact && a.contact.toLowerCase()
+                .includes(search)));
+            if (status) list = list.filter(a => a.status === status);
+
+            // 统计
+            document.getElementById('statTotalAgents').textContent = getAgents().length;
+            document.getElementById('statActiveAgents').textContent = getAgents().filter(a => a.status === '合作中').length;
+            document.getElementById('statInactiveAgents').textContent = getAgents().filter(a => a.status === '已暂停').length;
+
+            if (list.length === 0) {
+                tbody.innerHTML =
+                `<tr><td colspan="7" class="text-muted" style="text-align:center;padding:30px 0;">暂无中介</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = list.map(a => {
+                const clientCount = getClients().filter(c => c.agentId === a.id).length;
+                return `<tr>
+                            <td><strong>${a.name}</strong></td>
+                            <td>${a.contact || '-'}</td>
+                            <td>${a.phone || '-'}</td>
+                            <td><span class="status-tag ${a.status}">${a.status}</span></td>
+                            <td>${clientCount}</td>
+                            <td>${a.notes || ''}</td>
+                            <td style="text-align:right;white-space:nowrap;">
+                                <button class="btn btn-ghost btn-sm" onclick="editAgent('${a.id}')" title="编辑"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-ghost btn-sm" onclick="deleteAgent('${a.id}')" title="删除" style="color:var(--red);"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+            }).join('');
+        }
+
+        // ===== 房源管理 =====
         function renderProperties() {
             const tbody = document.getElementById('propertyTableBody');
             let list = getProperties();
@@ -2198,7 +2376,9 @@
                     `).join('');
         }
 
+        // =============================================================
         // 客户模态框
+        // =============================================================
         function openClientModal(id) {
             const client = id ? getClient(id) : null;
             document.getElementById('clientModalTitle').textContent = client ? `编辑客户 - ${client.company}` : '添加客户';
@@ -2213,6 +2393,12 @@
                 document.getElementById('fStage').value = client.stage || '意向';
                 document.getElementById('fSource').value = client.source || '其他';
                 document.getElementById('fNotes').value = client.notes || '';
+                // 设置中介
+                if (client.agentId) {
+                    document.getElementById('fAgentId').value = client.agentId;
+                } else {
+                    document.getElementById('fAgentId').value = '';
+                }
             } else {
                 document.getElementById('fCompany').value = '';
                 document.getElementById('fContact').value = '';
@@ -2223,7 +2409,12 @@
                 document.getElementById('fStage').value = '意向';
                 document.getElementById('fSource').value = '其他';
                 document.getElementById('fNotes').value = '';
+                document.getElementById('fAgentId').value = '';
             }
+            // 更新中介下拉
+            populateAgentSelect();
+            // 控制中介行显示
+            toggleAgentRow(document.getElementById('fSource').value);
             renderFollowups(id);
             populateFollowupPropertySelect();
             document.getElementById('fFollowupContent').value = '';
@@ -2233,6 +2424,36 @@
             document.getElementById('clientModal').classList.add('show');
         }
 
+        function populateAgentSelect() {
+            const select = document.getElementById('fAgentId');
+            const agents = getAgents();
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">请选择中介</option>';
+            agents.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.id;
+                opt.textContent = a.name + (a.status === '已暂停' ? ' (已暂停)' : '');
+                select.appendChild(opt);
+            });
+            if (currentVal) select.value = currentVal;
+        }
+
+        function toggleAgentRow(source) {
+            const row = document.getElementById('agentSelectRow');
+            if (source === '中介推荐') {
+                row.style.display = 'grid';
+                // 必填验证在保存时处理
+            } else {
+                row.style.display = 'none';
+                document.getElementById('fAgentId').value = '';
+            }
+        }
+
+        document.getElementById('fSource').addEventListener('change', function() {
+            toggleAgentRow(this.value);
+        });
+
+        // 跟进记录渲染
         function renderFollowups(clientId) {
             const container = document.getElementById('followupListContainer');
             const items = clientId ? getFollowups(clientId) : [];
@@ -2316,6 +2537,7 @@
                 sendFollowup(); }
         });
 
+        // 保存客户
         document.getElementById('saveClientBtn').addEventListener('click', function() {
             const editId = document.getElementById('clientEditId').value;
             const company = document.getElementById('fCompany').value.trim();
@@ -2325,6 +2547,15 @@
                 alert('请填写公司、联系人和电话');
                 return;
             }
+            const source = document.getElementById('fSource').value;
+            let agentId = '';
+            if (source === '中介推荐') {
+                agentId = document.getElementById('fAgentId').value;
+                if (!agentId) {
+                    alert('请选择关联中介');
+                    return;
+                }
+            }
             const data = {
                 company,
                 contact,
@@ -2333,7 +2564,8 @@
                 demandType: document.getElementById('fDemandType').value,
                 demandArea: parseFloat(document.getElementById('fDemandArea').value) || 0,
                 stage: document.getElementById('fStage').value,
-                source: document.getElementById('fSource').value,
+                source: source,
+                agentId: agentId,
                 notes: document.getElementById('fNotes').value.trim(),
                 createTime: new Date().toISOString().slice(0, 10),
             };
@@ -2361,6 +2593,79 @@
             renderDashboard();
         }
 
+        // =============================================================
+        // 中介管理操作
+        // =============================================================
+        document.getElementById('addAgentBtn').addEventListener('click', function() {
+            document.getElementById('agentModalTitle').textContent = '添加中介';
+            document.getElementById('agentEditId').value = '';
+            document.getElementById('fAgentName').value = '';
+            document.getElementById('fAgentContact').value = '';
+            document.getElementById('fAgentPhone').value = '';
+            document.getElementById('fAgentStatus').value = '合作中';
+            document.getElementById('fAgentNotes').value = '';
+            document.getElementById('agentModal').classList.add('show');
+        });
+
+        function editAgent(id) {
+            const agent = getAgent(id);
+            if (!agent) return;
+            document.getElementById('agentModalTitle').textContent = '编辑中介';
+            document.getElementById('agentEditId').value = id;
+            document.getElementById('fAgentName').value = agent.name || '';
+            document.getElementById('fAgentContact').value = agent.contact || '';
+            document.getElementById('fAgentPhone').value = agent.phone || '';
+            document.getElementById('fAgentStatus').value = agent.status || '合作中';
+            document.getElementById('fAgentNotes').value = agent.notes || '';
+            document.getElementById('agentModal').classList.add('show');
+        }
+
+        function deleteAgent(id) {
+            if (!confirm('确定删除该中介？')) return;
+            // 检查是否有客户关联
+            const related = getClients().filter(c => c.agentId === id);
+            if (related.length > 0) {
+                if (!confirm(`该中介有 ${related.length} 个关联客户，删除后这些客户将失去中介关联。确定继续？`)) return;
+                // 移除关联
+                related.forEach(c => { c.agentId = ''; });
+            }
+            window._agents = getAgents().filter(a => a.id !== id);
+            saveData();
+            renderAgents();
+            renderClients(); // 更新客户列表中的来源显示
+        }
+
+        document.getElementById('saveAgentBtn').addEventListener('click', function() {
+            const editId = document.getElementById('agentEditId').value;
+            const name = document.getElementById('fAgentName').value.trim();
+            if (!name) { alert('请输入中介名称'); return; }
+            const data = {
+                name,
+                contact: document.getElementById('fAgentContact').value.trim(),
+                phone: document.getElementById('fAgentPhone').value.trim(),
+                status: document.getElementById('fAgentStatus').value,
+                notes: document.getElementById('fAgentNotes').value.trim(),
+                createTime: new Date().toISOString().slice(0, 10),
+            };
+            if (editId) {
+                const idx = window._agents.findIndex(a => a.id === editId);
+                if (idx !== -1) { window._agents[idx] = { ...window._agents[idx], ...data }; }
+            } else {
+                data.id = generateId();
+                window._agents.push(data);
+            }
+            saveData();
+            document.getElementById('agentModal').classList.remove('show');
+            renderAgents();
+            // 更新客户模态框中的中介下拉
+            if (document.getElementById('clientModal').classList.contains('show')) {
+                populateAgentSelect();
+            }
+        });
+
+        // =============================================================
+        // 房源操作
+        // =============================================================
         function editProperty(id) {
             const p = getProperty(id);
             if (!p) return;
@@ -2428,7 +2733,9 @@
             renderDashboard();
         });
 
-        // 导出
+        // =============================================================
+        // 导出客户 (CSV)
+        // =============================================================
         document.getElementById('exportClientBtn').addEventListener('click', function() {
             const clients = getClients();
             if (clients.length === 0) { alert('暂无客户数据可导出'); return; }
@@ -2442,14 +2749,17 @@
             if (level) list = list.filter(c => c.level === level);
             if (list.length === 0) { alert('当前筛选条件下无客户可导出'); return; }
 
-            const headers = ['公司/品牌', '联系人', '电话', '意向等级', '需求业态', '需求面积(㎡)', '跟进阶段', '下次跟进时间', '渠道来源', '备注',
-                '创建日期'
+            const headers = ['公司/品牌', '联系人', '电话', '意向等级', '需求业态', '需求面积(㎡)', '跟进阶段', '渠道来源', '关联中介', '备注',
+                '下次跟进时间', '创建日期'
             ];
-            const rows = list.map(c => [
-                c.company || '', c.contact || '', c.phone || '', c.level || '', c.demandType || '',
-                c.demandArea || '', c.stage || '', c.nextFollowup || '', c.source || '', c.notes || '',
-                c.createTime || ''
-            ]);
+            const rows = list.map(c => {
+                const agent = c.agentId ? getAgent(c.agentId) : null;
+                return [
+                    c.company || '', c.contact || '', c.phone || '', c.level || '', c.demandType || '',
+                    c.demandArea || '', c.stage || '', c.source || '', agent ? agent.name : '',
+                    c.notes || '', c.nextFollowup || '', c.createTime || ''
+                ];
+            });
 
             let csv = '\uFEFF' + headers.join(',') + '\n';
             rows.forEach(row => {
@@ -2469,7 +2779,9 @@
             URL.revokeObjectURL(link.href);
         });
 
+        // =============================================================
         // 图表
+        // =============================================================
         let stageChartInst = null,
             levelChartInst = null,
             sourceChartInst = null;
@@ -2549,6 +2861,7 @@
             const titles = {
                 dashboard: '工作台',
                 clients: '客户管理',
+                agents: '中介管理',
                 properties: '房源管理',
                 analytics: '数据看板'
             };
@@ -2562,7 +2875,8 @@
                     setTimeout(() => { openClientModal(pendingClientId);
                         pendingClientId = null; }, 150);
                 }
-            } else if (page === 'properties') renderProperties();
+            } else if (page === 'agents') renderAgents();
+            else if (page === 'properties') renderProperties();
             else if (page === 'analytics') renderAnalytics();
             closeSidebar();
         }
@@ -2577,6 +2891,8 @@
         document.getElementById('clientSearch').addEventListener('input', renderClients);
         document.getElementById('clientStageFilter').addEventListener('change', renderClients);
         document.getElementById('clientLevelFilter').addEventListener('change', renderClients);
+        document.getElementById('agentSearch').addEventListener('input', renderAgents);
+        document.getElementById('agentStatusFilter').addEventListener('change', renderAgents);
         document.getElementById('propertySearch').addEventListener('input', renderProperties);
         document.getElementById('propertyStatusFilter').addEventListener('change', renderProperties);
 
@@ -2616,23 +2932,26 @@
         // =============================================================
         initPassword();
 
-        // 默认显示锁屏，先不加载数据
-        // 当解锁成功后加载
-
-        // 暴露全局函数供按钮调用
+        // 暴露全局函数
         window.openClientModal = openClientModal;
         window.editProperty = editProperty;
         window.deleteProperty = deleteProperty;
         window.deleteClient = deleteClient;
+        window.editAgent = editAgent;
+        window.deleteAgent = deleteAgent;
         window.navigateToClient = navigateToClient;
         window.navigateTo = navigateTo;
 
-        // 自动聚焦密码框
+        // 添加客户按钮
+        document.getElementById('addClientBtn').addEventListener('click', function() {
+            openClientModal(null);
+        });
+
         document.getElementById('lockPassword').focus();
 
-        console.log('🌸 梅梅工作台 v4.0 - 已启动');
+        console.log('🏢 招商工作台 v5.0 - 已增加中介管理模块');
         console.log('🔑 默认密码: 123456');
-        console.log('💡 右上角头像菜单可修改密码或锁定屏幕');
+        console.log('🤝 中介管理功能已就绪');
     </script>
 </body>
 </html>
